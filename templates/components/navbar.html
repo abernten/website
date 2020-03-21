@@ -1,0 +1,39 @@
+{% load static %}
+
+<!-- Navigation -->
+<nav class="navbar navbar-light bg-light navbar-expand-lg">
+    <div class="container">
+        <a class="navbar-brand" href="/">
+            <img src="{% static '/img/logo.png' %}" style="max-width: 100px">
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="fas fa-align-justify"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ml-auto">
+
+            <li class="nav-item dropdown">
+                {% if request.user.is_authenticated %}
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Eingeloggt als <strong>{{ request.user.username }}</strong>
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="#">
+                    <i class="fas fa-users"></i>
+                    Profil
+                    </a>
+                    <a class="dropdown-item" href="/accounts/logout">
+                    <i class="fas fa-power-off"></i>
+                    Logout
+                    </a>
+                </div>
+                {% else %}
+                <a class="nav-link" href="/accounts/login"><strong>Einloggen / Registrieren</strong></a>
+                {% endif %}
+            </li>
+
+
+            </ul>
+        </div>
+    </div>
+</nav>

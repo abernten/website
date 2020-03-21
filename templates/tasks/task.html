@@ -1,0 +1,52 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block styles %}
+{{ block.super }}
+
+<link href="{% static 'css/list.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+  <!-- Navigation -->
+  {% include 'components/navbar.html' %}
+<div class="bg1">
+    <div class="container py-3">
+        <div class="container-fluid">
+            <div>
+                <text>Titel: </text>
+                <input disabled>{{ task.titel }}</input>
+            </div>
+            <div>
+                <button type="button" class="btn btn-light rounded">
+                    <i class="far fa-eye"></i>
+                    Profil öffnen
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+  <!-- /.container -->
+
+  <!-- Footer -->
+  <footer class="fixed-bottom bg-light">
+    <div class="container text-center">
+        <img src="{% static '/img/wirvsvirus.jpg' %}" class="" alt="#WirVsVirus">
+    </div>
+    <!-- /.container -->
+  </footer>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+
+<script>
+  $(function () {
+    $('.selectpicker').selectpicker();
+});
+
+</script>
+{% endblock %}
+<!-- TODO: Filteroptionen verfügbar machen:
+  - Kategorien, Zeitraum, Ort
+  --->

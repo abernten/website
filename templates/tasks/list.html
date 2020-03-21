@@ -1,0 +1,98 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block styles %}
+{{ block.super }}
+
+<link href="{% static 'css/list.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+  <!-- Navigation -->
+  {% include 'components/navbar.html' %}
+
+  <div class="container-fluid">
+
+    <div class="input-group mb-3">
+      <div class="input-group-prepend">
+        <label class="input-group-text" for="inputGroupSelect01">Aufgaben Kategorien</label>
+      </div>
+      <select class="custom-select" id="inputGroupSelect01" length="400px">
+        <!-- Kategorien -->
+        {% for c in categories %}
+          <option value="{{ c.id }}">{{ c.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="input-group mb-3">
+      <div class="input-group-prepend">
+        <label class="input-group-text" for="inputGroupSelect01">Führerscheinklasse</label>
+      </div>
+      <select multiple data-style="bg-white"class="selectpicker border rounded">
+        <!-- Führerscheinklassen -->
+        {% for license in licenses %}
+          <option value="{{ license.id }}">{{ license.class_name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <input id="datepicker" width="276" />
+
+      <table class="table">
+        <thead class="thead-dark">
+          <tr>
+            <th class="col-3">Was?</th>
+            <th class="col-1">Wo?</th>
+            <th class="col-3">Wer sucht?</th>
+            <th class="col-1">Anforderungen?</th>
+            <th class="col-3">Hilf mit!</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for task in tasks %}
+          <tr>
+            <td>{{ task.description }}</th>
+            <td>{{ task.company.owner.zip_code}}</td>
+            <td>{{ task.company.company_name }}</td>
+            <td>{{ task.requirements}}</td>
+            <td>
+              <button type="button" class="btn btn-light rounded">
+                <i class="far fa-eye"></i>
+                Deatils zur Aufgabe
+              </button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <!-- /.container -->
+
+  <!-- Footer -->
+  <footer class="fixed-bottom bg-light">
+    <div class="container text-center">
+        <img src="{% static '/img/wirvsvirus.jpg' %}" class="" alt="#WirVsVirus">
+    </div>
+    <!-- /.container -->
+  </footer>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+
+<script>
+  $(function () {
+    $('.selectpicker').selectpicker();
+  });
+
+  $('#datepicker').datepicker({
+            uiLibrary: 'bootstrap4'
+        });
+</script>
+{% endblock %}
+
+<!-- TODO: Filteroptionen verfügbar machen:
+  - Kategorien, Zeitraum, Ort
+  --->

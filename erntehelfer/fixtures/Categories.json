@@ -1,0 +1,37 @@
+[
+    {
+        "model": "erntehelfer.Category",
+        "pk": 1,
+        "fields": {
+            "name": "Handarbeit"
+        }
+    },
+    {
+        "model": "erntehelfer.Category",
+        "pk": 2,
+        "fields": {
+            "name": "Aussaat"
+        }
+    },
+    {
+        "model": "erntehelfer.Category",
+        "pk": 3,
+        "fields": {
+            "name": "Pflanzenschutz"
+        }
+    },
+    {
+        "model": "erntehelfer.Category",
+        "pk": 4,
+        "fields": {
+            "name": "Bodenbearbeitung"
+        }
+    },
+    {
+        "model": "erntehelfer.Category",
+        "pk": 5,
+        "fields": {
+            "name": "Erntefahrer"
+        }
+    }
+]

@@ -1,0 +1,128 @@
+[
+    {
+        "model": "erntehelfer.LicenseClass",
+        "pk": 1,
+        "fields": {
+            "class_name": "AM"
+        }
+    },
+    {
+        "model": "erntehelfer.LicenseClass",
+        "pk": 2,
+        "fields": {
+            "class_name": "A1"
+        }
+    },
+    {
+        "model": "erntehelfer.LicenseClass",
+        "pk": 3,
+        "fields": {
+            "class_name": "A2"
+        }
+    },
+    {
+        "model": "erntehelfer.LicenseClass",
+        "pk": 4,
+        "fields": {
+            "class_name": "A"
+        }
+    },
+    {
+        "model": "erntehelfer.LicenseClass",
+        "pk": 5,
+        "fields": {
+            "class_name": "B1"
+        }
+    },
+    {
+        "model": "erntehelfer.LicenseClass",
+        "pk": 6,
+        "fields": {
+            "class_name": "B"
+        }
+    },
+    {
+        "model": "erntehelfer.LicenseClass",
+        "pk": 7,
+        "fields": {
+            "class_name": "C1"
+        }
+    },
+    {
+        "model": "erntehelfer.LicenseClass",
+        "pk": 8,
+        "fields": {
+            "class_name": "C"
+        }
+    },
+    {
+        "model": "erntehelfer.LicenseClass",
+        "pk": 9,
+        "fields": {
+            "class_name": "D1"
+        }
+    },
+    {
+        "model": "erntehelfer.LicenseClass",
+        "pk": 10,
+        "fields": {
+            "class_name": "D"
+        }
+    },
+    {
+        "model": "erntehelfer.LicenseClass",
+        "pk": 11,
+        "fields": {
+            "class_name": "BE"
+        }
+    },
+    {
+        "model": "erntehelfer.LicenseClass",
+        "pk": 12,
+        "fields": {
+            "class_name": "C1E"
+        }
+    },
+    {
+        "model": "erntehelfer.LicenseClass",
+        "pk": 13,
+        "fields": {
+            "class_name": "CE"
+        }
+    },
+    {
+        "model": "erntehelfer.LicenseClass",
+        "pk": 14,
+        "fields": {
+            "class_name": "D1E"
+        }
+    },
+    {
+        "model": "erntehelfer.LicenseClass",
+        "pk": 15,
+        "fields": {
+            "class_name": "DE"
+        }
+    },
+    {
+        "model": "erntehelfer.LicenseClass",
+        "pk": 16,
+        "fields": {
+            "class_name": "L"
+        }
+    },
+    {
+        "model": "erntehelfer.LicenseClass",
+        "pk": 17,
+        "fields": {
+            "class_name": "T"
+        }
+    },
+    {
+        "model": "erntehelfer.LicenseClass",
+        "pk": 18,
+        "fields": {
+            "class_name": "Stapler"
+        }
+    }
+]

@@ -1,0 +1,67 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block styles %}
+{{ block.super }}
+
+<link href="{% static 'css/background.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+  <!-- Navigation -->
+  {% include 'components/navbar.html' %}
+
+  <!-- Page Content -->
+  <div class="bg1">
+    <div class="container py-3">
+      <div class="card">
+        <div class="row ">
+          <div class="col-md-4">
+            <img src="{% static '/img/hillary-ungson-TdpSX7XAcKo-unsplash.jpg' %}" class="w-100">
+          </div>
+          <div class="col-md-8 px-3">
+            <br />              <br />
+            <div class="card-block px-3">
+              <h4 class="card-title">Was wir bewegen wollen</h4>
+              <p class="card-text">
+                In Krisenzeiten zeigt sich, wie stark die Bevölkerung zusammenhält und welche neuen Probleme auftreten.
+                Auch wir möchten unseren kleinen Beitrag zur Bewältigung der durch Covid-19 ausgelösten Krise beitragen.
+              </p>
+              <p class="card-text">
+                Viele Landwirte bangen aufgrund der Corona-Krise, um ihre Ernte oder Existenz.
+                Ursachen dafür sind das weg bleiben von Kunden bei Selbstvermarktung oder das Fehlen von Erntehelfern auf den Feldern.
+                Wir wollen eine Platform für Landwirte schaffen, die dringend neue Helfer suchen und für Helfer, die Ihre Arbeitskraft zur Verfügung
+                stellen wollen. Landwirtschaft macht allen Spaß - am Ende des Tages sieht man tatsächlich mit seinen eigenen Händen geschaft hat.
+              </p>
+              <p class="card-text">
+                Unser Beitrag soll Landwirten aller Sparten eine kostenlose, einfache und übersichtliche Vermitttlung von Helfern geben und
+                die dringend benötigten Kontakte vermitteln. Durch dieses Projekt kann die Zivilbevölkerung wieder mehr mit der heimischen Landwirtschaft
+                in Kontakt kommen, die Prozesse und Sorgen von Landwirten ergründen und einige Zeit selbst diese Arbeit verrichten.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /.container -->
+
+  <!-- Footer -->
+  <footer class="fixed-bottom bg-light">
+    <div class="container p-1">
+
+      <div class="row">
+        <div class="col-sm">
+          <a href="https://wirvsvirushackathon.org/"><img src="{% static '/img/wirvsvirus.jpg' %}" alt="#WirVsVirus"></a>
+        </div>
+        <div class="col-sm text-right">
+          <a href="/imprint">Impressum</a>
+           |
+          <a href="/privacy">Datenschutzerklärung</a>
+        </div>
+
+    </div>
+
+
+  </footer>
+{% endblock %}

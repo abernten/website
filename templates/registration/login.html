@@ -1,0 +1,55 @@
+{% extends 'layout.html' %}
+
+{% load static %}
+
+{% block styles %}
+{{ block.super }}
+
+<link href="{% static 'css/login.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-10 col-xl-9 mx-auto">
+        <div class="card card-signin flex-row my-5" style="min-height: 500px;">
+          <div class="card-img-left d-none d-md-flex">
+             <!-- Background image for card set in CSS! -->
+          </div>
+          <div class="card-body">
+            <h5 class="card-title text-center">Einloggen</h5>
+
+            <form class="form-signin" method="post" action="">
+
+              {% if messages %}
+                {% for message in messages %}
+                  <div class="alert alert-danger" role="alert">
+                    {{ message }}
+                  </div>
+                {% endfor %}
+              {% endif %}
+
+
+
+              <div class="form-label-group">
+                <input type="text" id="inputUserame" class="form-control" placeholder="Benutzername" name="username" required>
+                <label for="inputUserame">Benutzername</label>
+              </div>
+
+              <div class="form-label-group">
+                <input type="password" id="inputPassword" class="form-control" placeholder="Passwort" name="password" required>
+                <label for="inputPassword">Passwort</label>
+              </div>
+
+              {% csrf_token %}
+
+              <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Einloggen</button>
+              <a href="/accounts/register-citizen" class="btn btn-lg btn-light btn-block text-uppercase">Registrieren als Helfer</a>
+              <a href="/accounts/register-company" class="btn btn-lg btn-light btn-block text-uppercase">Registrieren als Betrieb</a>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
