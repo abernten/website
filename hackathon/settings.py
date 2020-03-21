@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'crispy_forms',
     'erntehelfer'
 ]
 
@@ -129,3 +130,6 @@ STATICFILES_DIRS = [
 AUTH_USER_MODEL = 'erntehelfer.User'
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
+
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'

@@ -5,48 +5,61 @@
 {{ block.super }}
 
 <link href="{% static 'css/list.css' %}" rel="stylesheet">
+<link href="{% static 'css/background.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
-  <!-- Navigation -->
-  {% include 'components/navbar.html' %}
+{% include 'components/navbar.html' %}
+
 <div class="bg1">
     <div class="container py-3">
-        <div class="container-fluid">
-            <div>
-                <text>Titel: </text>
-                <input disabled>{{ task.titel }}</input>
-            </div>
-            <div>
-                <button type="button" class="btn btn-light rounded">
-                    <i class="far fa-eye"></i>
-                    Profil öffnen
-                </button>
+        <div class="card">
+            <div class="p-3">
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <td class="col-3">Titel:</td>
+                            <td>{{ task.title }}</td>
+                        </tr>
+                        <tr>
+                            <td>Zeitraum:</td>
+                            <td>{{ task.start_date }} bis {{ task.end_date }}</td>
+                        </tr>
+                        <tr>
+                            <td>Benötigte Führerscheinklassen:</td>
+                            <td>
+                                {% for license in licenses %}
+                                    <span class="badge badge-pill badge-secondary">{{ license.class_name }}</span>
+                                {% endfor %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Ort:</td>
+                            <td>{% firstof task.company.zip_code '-' %}, {% firstof task.company.city '-' %}</td>
+                        </tr>
+                        <tr>
+                            <td>Beschreibung: </td>
+                            <td>{{ task.description }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="text-center my-3">
+                    <button type="button" class="btn btn-lg btn-primary rounded-pill" style="background-color: #a88b48; border: none;">Mitmachen!</button>
+                </div>
             </div>
         </div>
     </div>
 </div>
-  <!-- /.container -->
+{% include 'components/footer.html' %}
 
-  <!-- Footer -->
-  <footer class="fixed-bottom bg-light">
-    <div class="container text-center">
-        <img src="{% static '/img/wirvsvirus.jpg' %}" class="" alt="#WirVsVirus">
-    </div>
-    <!-- /.container -->
-  </footer>
 {% endblock %}
 
 {% block scripts %}
 {{ block.super }}
 
 <script>
-  $(function () {
-    $('.selectpicker').selectpicker();
-});
-
+    $(function () {
+        $('.selectpicker').selectpicker();
+    });
 </script>
 {% endblock %}
-<!-- TODO: Filteroptionen verfügbar machen:
-  - Kategorien, Zeitraum, Ort
-  --->

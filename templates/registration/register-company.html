@@ -6,13 +6,14 @@
 {{ block.super }}
 
 <link href="{% static 'css/login.css' %}" rel="stylesheet">
+<link href="{% static 'css/background.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
   <div class="container">
     <div class="row">
       <div class="col-lg-10 col-xl-9 mx-auto">
-        <div class="card card-signin flex-row my-5">
+        <div class="card card-signin flex-row my-5 shadow-lg">
           <div class="card-img-left d-none d-md-flex">
              <!-- Background image for card set in CSS! -->
           </div>
@@ -20,34 +21,48 @@
             <h5 class="card-title text-center">Als Betrieb registrieren</h5>
             <form class="form-signin">
               <div class="form-label-group">
-                <input type="text" id="inputUserame" class="form-control" placeholder="Username" required autofocus>
-                <label for="inputUserame">Username</label>
+                <input type="text" id="inputUserame" class="form-control" placeholder="Benutzername" required autofocus>
+                <label for="inputUserame">Benutzername</label>
               </div>
 
               <div class="form-label-group">
-                <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required>
-                <label for="inputEmail">Email address</label>
+                <input type="email" id="inputEmail" class="form-control" placeholder="E-Mail Adresse" required>
+                <label for="inputEmail">E-Mail Adresse</label>
               </div>
 
               <hr>
 
               <div class="form-label-group">
-                <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
-                <label for="inputPassword">Password</label>
+                <input type="text" id="inputCompanyName" class="form-control" placeholder="Firmenname" required>
+                <label for="inputCompanyName">Betriebsname</label>
               </div>
 
               <div class="form-label-group">
-                <input type="password" id="inputConfirmPassword" class="form-control" placeholder="Password" required>
-                <label for="inputConfirmPassword">Confirm password</label>
+                <input type="text" id="inputCompanyNumber" class="form-control" placeholder="Betriebsnummer (optional)">
+                <label for="inputCompanyNumber">Betriebsnummer (optional)</label>
               </div>
 
-              <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Register</button>
-              <a class="d-block text-center mt-2 small" href="#">Sign In</a>
-              <hr class="my-4">
+              <hr>
+
+              <div class="form-label-group">
+                <input type="password" id="inputPassword" class="form-control" placeholder="Passwort" required>
+                <label for="inputPassword">Passwort</label>
+              </div>
+
+              <div class="form-label-group">
+                <input type="password" id="inputConfirmPassword" class="form-control" placeholder="Passwort bestätigen" required>
+                <label for="inputConfirmPassword">Passwort bestätigen</label>
+              </div>
+
+              <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Registrieren</button>
+              <a class="d-block text-center mt-2 small" href="/accounts/login">Mit einem bestehenden Konto einloggen</a>
             </form>
           </div>
         </div>
       </div>
     </div>
   </div>
+
+  {% include 'components/footer.html' %}
+
 {% endblock %}

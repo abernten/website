@@ -1,0 +1,77 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block styles %}
+{{ block.super }}
+
+<link href="{% static 'css/list.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+{% include 'components/navbar.html' %}
+
+  <div class="container my-3">
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/companies">Betriebsliste</a></li>
+        <li class="breadcrumb-item active">{{ company.company_name }}</li>
+      </ol>
+    </nav>
+
+    <div class="card my-3">
+        <div  class="row">
+          <div class="col-3">
+            <!--TODO: Default Profilbild und Abfrage-->
+            <img src="http://thetransformedmale.files.wordpress.com/2011/06/bruce-wayne-armani.jpg" class="card-img img-fluid" style="height: 100%; width: 100%" alt="Profilbild" >
+          </div>
+            <div class="card-body col-9">
+                <form method="post" action="">
+                    <h2>Helferprofil aktualisieren</h2>
+                    <br />
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <td class="col-3">Vorname:</td>
+                                <td><input name="first_name" class="form-control" required></input></td>
+                            </tr>
+                            <tr>
+                                <td class="col-3">Nachname:</td>
+                                <td><input name="last_name" class="form-control" required></input></td>
+                            </tr>
+                            <tr>
+                                <td>Führerscheinklassen: </td>
+                                <td>
+                                    <div class="input-group my-1">
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="drivers_licenses">Führerschein</label>
+                                        </div>
+                                        <select name="drivers_licenses" multiple data-style="bg-white" class="selectpicker border rounded" id="drivers_licenses">
+                                            <!-- Führerscheinklassen -->
+                                            {% for license in licenses %}
+                                                <option value="{{ license.id }}">{{ license.class_name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Erfahrungsbeschreibung: </td>
+                                <td><input name="description" class="form-control" rows="3" value="{{citizen.description}}"></input></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    {% csrf_token %}
+
+                    <div class="text-center my-3">
+                        <button type="submit" class="btn btn-lg btn-primary rounded-pill" style="background-color: #a88b48; border: none;">Speichern
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+  </div>
+
+{% include 'components/footer.html' %}
+{% endblock %}
+

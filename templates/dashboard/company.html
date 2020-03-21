@@ -1,0 +1,58 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block styles %}
+{{ block.super }}
+
+<link href="{% static 'css/list.css' %}" rel="stylesheet">
+<link href="{% static 'css/background.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+{% include 'components/navbar.html' %}
+
+<div class="bg1">
+    <div class="container">
+        <a href="/tasks/create" class="btn btn-success rounded-pill my-3">
+            <i class="fas fa-plus"></i>
+            Neue Aufgabe erstellen
+        </a>
+
+        <div class="row my-1">
+            <div class="col">
+                {% for task in tasks %}
+
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Ich suche Hilfe bei: </h5>
+                        <div class="card">
+                            <div class="card-body">
+                                <p class="font-weight-bold"> {{ task.title }} </p>
+                                <p> Beschreibung: {{ task.description }} </p>
+                                <a class="btn rounded-pill" style="background-color: #a88b48; border: none;" href="/tasks/{{ task.id }}">
+                                    <i class="far fa-eye"></i>
+                                    Aufgabe öffnen
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% endfor %}
+            </div>
+
+            <div class="col">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Interessenten</h5>
+                        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include 'components/footer.html' %}
+{% endblock %}
+

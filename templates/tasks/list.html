@@ -13,31 +13,42 @@
 
   <div class="container-fluid">
 
-    <div class="input-group mb-3">
-      <div class="input-group-prepend">
-        <label class="input-group-text" for="inputGroupSelect01">Aufgaben Kategorien</label>
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Filteroptionen</h5>
+        <div class="input-group my-1">
+          <div class="input-group-prepend">
+            <label class="input-group-text" for="categorieSelect">Aufgaben Kategorien</label>
+          </div>
+          <select class="custom-select" id="categorieSelect" length="400px">
+            <!-- Kategorien -->
+            {% for c in categories %}
+              <option>Alles</option>
+              <option value="{{ c.id }}">{{ c.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="input-group my-1">
+          <div class="input-group-prepend">
+            <label class="input-group-text" for="driverLicenseSelect">Führerschein</label>
+          </div>
+          <select multiple data-style="bg-white" class="selectpicker border rounded" id="driverLicenseSelect">
+            <!-- Führerscheinklassen -->
+            {% for license in licenses %}
+              <option value="{{ license.id }}">{{ license.class_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="input-group my-1">
+          <div class="input-group-prepend">
+            <label class="input-group-text" for="dateSelect">
+              <i class="fas fa-calendar-alt"></i>
+            </label>
+          </div>
+          <input type="date" class="form-control" id="dateSelect">
+        </div>
       </div>
-      <select class="custom-select" id="inputGroupSelect01" length="400px">
-        <!-- Kategorien -->
-        {% for c in categories %}
-          <option value="{{ c.id }}">{{ c.name }}</option>
-        {% endfor %}
-      </select>
     </div>
-
-    <div class="input-group mb-3">
-      <div class="input-group-prepend">
-        <label class="input-group-text" for="inputGroupSelect01">Führerscheinklasse</label>
-      </div>
-      <select multiple data-style="bg-white"class="selectpicker border rounded">
-        <!-- Führerscheinklassen -->
-        {% for license in licenses %}
-          <option value="{{ license.id }}">{{ license.class_name }}</option>
-        {% endfor %}
-      </select>
-    </div>
-
-    <input id="datepicker" width="276" />
 
       <table class="table">
         <thead class="thead-dark">
@@ -59,7 +70,7 @@
             <td>
               <button type="button" class="btn btn-light rounded">
                 <i class="far fa-eye"></i>
-                Deatils zur Aufgabe
+                Details zur Aufgabe
               </button>
             </td>
           </tr>
@@ -70,13 +81,8 @@
   </div>
   <!-- /.container -->
 
-  <!-- Footer -->
-  <footer class="fixed-bottom bg-light">
-    <div class="container text-center">
-        <img src="{% static '/img/wirvsvirus.jpg' %}" class="" alt="#WirVsVirus">
-    </div>
-    <!-- /.container -->
-  </footer>
+{% include 'components/footer.html' %}
+
 {% endblock %}
 
 {% block scripts %}
@@ -86,13 +92,5 @@
   $(function () {
     $('.selectpicker').selectpicker();
   });
-
-  $('#datepicker').datepicker({
-            uiLibrary: 'bootstrap4'
-        });
 </script>
 {% endblock %}
-
-<!-- TODO: Filteroptionen verfügbar machen:
-  - Kategorien, Zeitraum, Ort
-  --->

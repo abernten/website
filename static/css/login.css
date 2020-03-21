@@ -3,6 +3,10 @@
     --input-padding-y: .75rem;
   }
 
+body {
+  background: #F0F0F0;
+}
+
 
 .card-signin {
 border: 0;

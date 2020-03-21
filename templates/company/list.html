@@ -1,0 +1,42 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block content %}
+  {% include 'components/navbar.html' %}
+
+  <div class="container my-3">
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item active">Betriebsliste</li>
+        </ol>
+      </nav>
+
+      <table class="table">
+        <thead class="thead-dark">
+          <tr>
+            <th style="width: 35%">Wer sucht?</th>
+            <th style="width: 15%">Wo?</th>
+            <th style="width: 35%">Was?</th>
+            <th style="width: 15%">Hilf mit!</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for company in companies %}
+          <tr>
+            <td>{{ company.company_name }}</th>
+            <td>{{ company.owner.zip_code }}</td>
+            <td>{{ company.description }}</td>
+            <td>
+              <a class="btn btn-light rounded" href="/companies/{{ company.id }}">
+                <i class="far fa-eye"></i>
+                Profil öffnen
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+{% include 'components/footer.html' %}
+{% endblock %}

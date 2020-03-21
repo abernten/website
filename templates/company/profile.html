@@ -1,0 +1,44 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block styles %}
+{{ block.super }}
+
+<link href="{% static 'css/list.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+{% include 'components/navbar.html' %}
+
+  <div class="container my-3">
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/companies">Betriebsliste</a></li>
+        <li class="breadcrumb-item active">{{ company.company_name }}</li>
+      </ol>
+    </nav>
+
+    <div class="card my-3">
+        <div  class="row">
+          <div class="col-3">
+            <!--TODO: Default Profilbild und Abfrage-->
+            <img src="http://thetransformedmale.files.wordpress.com/2011/06/bruce-wayne-armani.jpg" class="card-img img-fluid" style="height: 100%; width: 100%" alt="Profilbild" >
+          </div>
+            <div class="card-body col-9">
+                <table class="table">
+                    <tr>
+                        <td class="font-weight-bold col-1">Name: </td>
+                        <td>{{ company.company_name }}</td>
+                    </tr>
+                    <tr>
+                      <td class="font-weight-bold">Selbstbeschreibung: </td>
+                      <td>{{ company.description }}</td>
+                  </tr>
+                </table>
+            </div>
+        </div>
+  </div>
+
+{% include 'components/footer.html' %}
+{% endblock %}
+

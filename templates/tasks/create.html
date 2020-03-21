@@ -1,0 +1,108 @@
+
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block styles %}
+{{ block.super }}
+
+<link href="{% static 'css/list.css' %}" rel="stylesheet">
+<link href="{% static 'css/background.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+{% include 'components/navbar.html' %}
+
+<div class="bg1">
+    <div class="container py-3">
+        <div class="card">
+            <div class="p-3">
+                <form method="post" action="">
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <td class="col-3">Titel:</td>
+                                <td><input name="TITLE" class="form-control" required></input></td>
+                            </tr>
+                            <tr>
+                                <td>Zeitraum:</td>
+                                <td>
+                                    <div class="input-group my-1">
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="start_date">
+                                                <i class="fas fa-calendar-alt"></i>
+                                            </label>
+                                        </div>
+                                        <input name="start_date" type="date" class="form-control" id="start_date" required>
+                                        <label class="col-sm-auto col-form-label">bis</label>
+                                        <div class="input-group-prepend">
+                                            <label class="input-group-text" for="end_date">
+                                                <i class="fas fa-calendar-alt"></i>
+                                            </label>
+                                        </div>
+                                        <input name="end_date" type="date" class="form-control" id="end_date" required>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Benötigte Führerscheinklassen:</td>
+                                <td>
+                                    <div class="input-group my-1">
+                                        <div class="input-group-prepend">
+                                        <label class="input-group-text" for="drivers_licenses">Führerschein</label>
+                                        </div>
+                                        <select name="drivers_licenses" multiple data-style="bg-white" class="selectpicker border rounded" id="drivers_licenses">
+                                        <!-- Führerscheinklassen -->
+                                        {% for license in licenses %}
+                                            <option value="{{ license.id }}">{{ license.class_name }}</option>
+                                        {% endfor %}
+                                        </select>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Kategorie</td>
+                                <td>
+                                    <div class="input-group my-1">
+                                        <div class="input-group-prepend">
+                                        <label class="input-group-text" for="category">Kategorie</label>
+                                        </div>
+                                        <select name="category" class="selectpicker border rounded" id="category" required>
+                                        <!-- Kategorien -->
+                                        {% for category in categories %}
+                                            <option value="{{ category.id }}">{{ category.name }}</option>
+                                        {% endfor %}
+                                        </select>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Beschreibung: </td>
+                                <td><textarea name="description" class="form-control" rows="3" placeholder="Geben Sie eine Beschreibung ein!" required></textarea></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    {% csrf_token %}
+
+                    <div class="text-center my-3">
+                        <button type="submit" class="btn btn-lg btn-primary rounded-pill" style="background-color: #a88b48; border: none;">Aufgabe erstellen!</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% include 'components/footer.html' %}
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+
+<script>
+    $(function () {
+        $('.selectpicker').selectpicker();
+    });
+</script>
+{% endblock %}
