@@ -18,21 +18,27 @@
                     Eingeloggt als <strong>{{ request.user.username }}</strong>
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item" href="#">
-                    <i class="fas fa-users"></i>
-                    Profil
+                    <a class="dropdown-item" href="/settings">
+                        <i class="fas fa-fw fa-users"></i>
+                        Profileinstellungen
                     </a>
+
+                    <a class="dropdown-item" href="/settings/user">
+                        <i class="fas fa-fw fa-cogs"></i>
+                        Kontoeinstellungen
+                    </a>
+
+                    <div class="drowpdown-divider"></div>
+
                     <a class="dropdown-item" href="/accounts/logout">
-                    <i class="fas fa-power-off"></i>
-                    Logout
+                        <i class="fas fa-fw fa-power-off"></i>
+                        Logout
                     </a>
                 </div>
                 {% else %}
                 <a class="nav-link" href="/accounts/login"><strong>Einloggen / Registrieren</strong></a>
                 {% endif %}
             </li>
-
-
             </ul>
         </div>
     </div>

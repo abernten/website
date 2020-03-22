@@ -6,7 +6,7 @@ class User(AbstractUser):
 
 class Category(models.Model):
     class Meta:
-        verbose_name = 'Kategorie'
+        verbose_name        = 'Kategorie'
         verbose_name_plural = 'Kategorien'
 
     name = models.CharField(max_length=250)
@@ -16,7 +16,7 @@ class Category(models.Model):
 
 class Task(models.Model):
     class Meta:
-        verbose_name = 'Aufgabe'
+        verbose_name        = 'Aufgabe'
         verbose_name_plural = verbose_name + 'n'
 
     # Besitzer
@@ -26,6 +26,7 @@ class Task(models.Model):
     title       = models.CharField(max_length=250)
     description = models.TextField() # Art des Jobs
     category    = models.ForeignKey('Category', on_delete=models.PROTECT)
+    zip_code    = models.CharField(max_length=16, blank=True, null=True)
 
     # Beginn und Ende
     start_date = models.DateField()
@@ -42,11 +43,11 @@ class Task(models.Model):
 
 class CompanyProfile(models.Model):
     class Meta:
-        verbose_name = 'Betriebsprofil'
+        verbose_name        = 'Betriebsprofil'
         verbose_name_plural = verbose_name + 'e'
 
     # Besitzer
-    owner          = models.ForeignKey('User', on_delete=models.CASCADE)
+    owner = models.ForeignKey('User', on_delete=models.CASCADE)
 
     # Grunddaten
     company_name   = models.CharField(max_length=250)
@@ -59,18 +60,18 @@ class CompanyProfile(models.Model):
     country  = models.CharField(max_length=2, blank=True, null=True) # Zweistelliger Laendercode
 
     # Betriebsbeschreibung
-    description    = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.company_name
 
 class CitizenProfile(models.Model):
     class Meta:
-        verbose_name = 'Helferprofil'
+        verbose_name        = 'Helferprofil'
         verbose_name_plural = verbose_name + 'e'
 
     # Besitzer
-    owner            = models.ForeignKey('User', on_delete=models.CASCADE)
+    owner = models.ForeignKey('User', on_delete=models.CASCADE)
 
     # Grunddaten
     date_of_birth    = models.DateField()
@@ -84,10 +85,36 @@ class CitizenProfile(models.Model):
 
 class LicenseClass(models.Model):
     class Meta:
-        verbose_name = 'Führerscheinklasse'
+        verbose_name        = 'Führerscheinklasse'
         verbose_name_plural = verbose_name + 'n'
 
-    class_name = models.CharField(max_length=3) # EU-Fuehrerscheinklassen
+    # EU-Fuehrerscheinklassen
+    class_name = models.CharField(max_length=3)
 
     def __str__(self):
         return self.class_name
+
+class InterestOffer(models.Model):
+    class Meta:
+        verbose_name        = "Interessensangebot"
+        verbose_name_plural = verbose_name + 'e'
+
+    STATES = [
+        (0, 'Offen'),
+        (1, 'Bestätigt'),
+        (2, 'Abgelehnt'),
+    ]
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    changed_at = models.DateTimeField(auto_now=True)
+
+    # Status
+    state = models.IntegerField(default=0, choices=STATES)
+
+    # Referenzen
+    task    = models.ForeignKey('Task', on_delete=models.CASCADE)
+    citizen = models.ForeignKey('CitizenProfile', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return 'Angebot von "{} {}" an "{}"'.format(self.citizen.owner.first_name, self.citizen.owner.last_name, self.task.title)
+

@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 
-from .models import CompanyProfile, Category, CitizenProfile, Task, LicenseClass
+from .models import CompanyProfile, Category, CitizenProfile, Task, LicenseClass, InterestOffer
 from .forms import TaskForm
 
 class IndexView(View):
@@ -92,7 +92,7 @@ class CompanyProfileView(View):
             'company': company
         })
 
-class SettingsCitizenView(View):
+class SettingsView(View):
 
     def get(self, request):
         if request.user.groups.filter(name__in=['Helfer']).exists():
@@ -103,12 +103,7 @@ class SettingsCitizenView(View):
                 'licenses': licenses
             })
         else:
-            return redirect('/dashboard')
-
-class SettingsCompanyView(View):
-
-    def get(self, request):
-        return render(request, 'settings/company.html')
+            return render(request, 'settings/company.html')
 
 class SettingsUserView(View):
 
@@ -135,29 +130,43 @@ class TaskView(View):
         categories = Category.objects.all()
         companies = CompanyProfile.objects.all()
 
+        is_helfer = request.user.groups.filter(name__in=['Helfer']).exists()
+        is_owner = False
+        if request.user.groups.filter(name__in=['Betrieb']).exists():
+            company = CompanyProfile.objects.get(owner__id=request.user.id)
+            is_owner = task.company.id == company.id
+
         return render(request, 'tasks/task.html', {
             'categories': categories,
             'companies': companies,
             'task': task,
-            'licenses': licenses
+            'licenses': licenses,
+            'is_helfer': is_helfer,
+            'is_owner': is_owner
         })
 
 class DashboardView(LoginRequiredMixin, View):
     login_url = '/accounts/login/'
 
     def get(self, request):
-        company = CompanyProfile.objects.get(owner__id=request.user.id)
-        tasks = Task.objects.filter(company__id=company.id)
-
         if request.user.groups.filter(name__in=['Helfer']).exists():
+            citizen = CitizenProfile.objects.get(owner__id=request.user.id)
+            interests = InterestOffer.objects.filter(citizen__id=citizen.id).order_by('-changed_at')
+
             # Citizen
             return render(request, 'dashboard/citizen.html', {
-                'tasks': tasks
+                # 'citizen': citizen,
+                'interests': interests
             })
         else:
+            company = CompanyProfile.objects.get(owner__id=request.user.id)
+            tasks = Task.objects.filter(company__id=company.id)
+            interests = InterestOffer.objects.filter(task__company__id=company.id)
+
             # Company
             return render(request,'dashboard/company.html', {
-                'tasks': tasks
+                'tasks': tasks,
+                'interests': interests
             })
 
 class CreateTaskView(View):
@@ -175,13 +184,50 @@ class CreateTaskView(View):
 
     def post(self, request):
         company = CompanyProfile.objects.get(owner__id=request.user.id)
-        form = TaskForm(request.POST, initial={
-            'company': company
-        })
+        form = TaskForm(request.POST)
 
         if form.is_valid():
-            task = form.save()
-            return redirect('/tasks/' + task.id)
+            task = form.save(commit=False)
+            task.company = company
+            task.save()
+            return redirect('/tasks/{}'.format(task.id))
         else:
             messages.error(request, 'Bitte überprüfen Sie noch einmal die Eingabe!')
-            return render(request, 'tasks/create.html')
+            return render(request, 'tasks/create.html', {'form': form})
+
+class InterestOfferView(View):
+
+    def get(self, request):
+        if request.user.groups.filter(name__in=['Helfer']).exists():
+            # Citizen
+            citizen = CitizenProfile.objects.get(owner__id=request.user.id)
+            interested = InterestOffer.objects.filter(citizen__id=citizen.id)
+            return render(request, 'interested/citizen.html', {
+                'citizen': citizen,
+                'interested': interested
+            })
+        else:
+            company = CompanyProfile.objects.get(owner__id=request.user.id)
+            interested = InterestOffer.objects.filter(task__company__id=company.id)
+
+            # Company
+            return render(request,'interested/company.html', {
+                'company': company,
+                'interested': interested
+            })
+
+class EditTaskView(View):
+
+    def get(self, request, id):
+        task = Task.objects.get(pk=id)
+        licenses = LicenseClass.objects.all()
+        categories = Category.objects.all()
+
+        if request.user.groups.filter(name__in=['Betrieb']).exists():
+            return render(request, 'tasks/edit.html', {
+            'categories': categories,
+            'licenses': licenses,
+            'task': task
+            })
+        else:
+            return redirect('/dashboard')

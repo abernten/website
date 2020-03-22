@@ -11,9 +11,14 @@
 {% block content %}
 {% include 'components/navbar.html' %}
 
-    <div class="container py-3">
+    <div class="container my-3">
+        <nav>
+            <ol class="breadcrumb mb-1">
+              <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+              <li class="breadcrumb-item active">Profileinstellungen</li>
+            </ol>
+          </nav>
         <div class="card">
-            <div class="p-3">
                 <form method="post" action="">
                     <h2>Firmenprofil aktualisieren</h2>
                     <br />
@@ -67,7 +72,6 @@
                         </button>
                     </div>
                 </form>
-            </div>
         </div>
     </div>
 

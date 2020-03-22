@@ -20,32 +20,50 @@
 
         <div class="row my-1">
             <div class="col">
-                {% for task in tasks %}
-
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Ich suche Hilfe bei: </h5>
-                        <div class="card">
-                            <div class="card-body">
-                                <p class="font-weight-bold"> {{ task.title }} </p>
-                                <p> Beschreibung: {{ task.description }} </p>
-                                <a class="btn rounded-pill" style="background-color: #a88b48; border: none;" href="/tasks/{{ task.id }}">
-                                    <i class="far fa-eye"></i>
-                                    Aufgabe öffnen
-                                </a>
-                            </div>
+                        <h5 class="card-title">
+                            Ich suche Hilfe bei:
+                        </h5>
+                        <div class="card-body">
+                            <ul class="list-group">
+                                {% for task in tasks %}
+                                    <li class="list-group-item">
+                                        <p class="font-weight-bold">
+                                            {{ task.title }}
+                                            <a class="btn btn-sm rounded-pill float-right" style="background-color: #a88b48; border: none;" href="/tasks/{{ task.id }}">
+                                                <i class="far fa-eye"></i>
+                                                Aufgabe öffnen
+                                            </a>
+                                        </p>
+                                        <p> Beschreibung: {{ task.description }} </p>
+                                    </li>
+                                {% endfor %}
+                            </ul>
                         </div>
                     </div>
                 </div>
-
-                {% endfor %}
             </div>
 
             <div class="col">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Interessenten</h5>
-                        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                        <h5 class="card-title">
+                            Helfer mit Interesse:
+                            <a class="btn btn-sm rounded-pill float-right" style="background-color: #a88b48; border: none;" href="/interests">
+                                <i class="far fa-eye"></i>
+                                Intressentenliste öffnen
+                            </a>
+                        </h5>
+                        <ul class="list-group">
+                            {% for interest in interests %}
+                                <li class="list-group-item">
+                                    <p>{{ interest.citizen.owner.first_name }}{{ interest.citizen.owner.last_name }}</p>
+                                    <span class="font-weight-bold">Interessiert an:</span>
+                                    <span>{{ interest.task.title }}</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
                     </div>
                 </div>
             </div>
