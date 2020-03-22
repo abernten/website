@@ -20,6 +20,14 @@
       </ol>
     </nav>
 
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert {% if message.tags %}{{ message.tags }}{% endif %} my-2">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+
     <table class="table table-light table-striped my-1">
       <thead class="thead-light">
         <tr>
@@ -46,17 +54,27 @@
                 {% endfor %}
             </td>
             <td>{{ interest.created_at}}</td>
+            {% if interest.state == 0 %}
             <td>
-                <div class="btn-group float-right">
-                    <a class="btn-sm btn-success mr-2 rounded" href="/interest/{{ interest.id }}/accept">
-                      <i class="fas fa-fw fa-check"></i>
-                    </a>
-                    <a class="btn-sm btn-danger rounded" href="/interest/{{ interest.id }}/decline">
-                      <i class="fas fa-fw fa-times"></i>
-                    </a>
-                </div>
-          </td>
-        </tr>
+              <div class="btn-group float-right">
+                <a class="btn-sm btn-success mr-2 rounded" href="/interests/{{ interest.id }}/accept">
+                  <i class="fas fa-fw fa-check"></i>
+                </a>
+                <a class="btn-sm btn-danger rounded" href="/interests/{{ interest.id }}/decline">
+                  <i class="fas fa-fw fa-times"></i>
+                </a>
+              </div>
+            </td>
+            {% elif interest.state == 1 %}
+            <td>
+              <label>Daten verschickt!</label>
+            </td>
+            {% elif interest.state == 2%}
+              <td>
+                <label>Abgelehnt!</label>
+              </td>
+            {% endif %}
+          </tr>
         {% endfor %}
       </tbody>
     </table>

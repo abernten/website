@@ -36,6 +36,10 @@
                             <td>{{ task.title }}</td>
                         </tr>
                         <tr>
+                            <td class="font-weight-bold">Kategorie:</td>
+                            <td>{{task.category.name}}</td>
+                        </tr>
+                        <tr>
                             <td class="font-weight-bold">Zeitraum:</td>
                             <td>{{ task.start_date }} bis {{ task.end_date }}</td>
                         </tr>
@@ -60,12 +64,17 @@
 
                 {% if is_helfer %}
                     <div class="text-center my-3">
-                        <button type="button" class="btn btn-lg btn-primary rounded-pill" style="background-color: #a88b48; border: none;">Mitmachen!</button>
+                        <a type="button" class="btn btn-lg btn-primary rounded-pill" style="background-color: #a88b48; border: none;" href="/tasks/{{ task.id }}/participate">
+                        Mitmachen!
+                        </a>
                     </div>
                 {% elif is_owner %}
                     <div class="text-center my-3">
-                        <a type="button" class="btn btn-lg btn-primary rounded-pill" style="background-color: #a88b48; border: none;" href="/tasks/edit/{{ task.id }}">
-                        Bearbeiten!
+                        <a type="button" class="btn btn-lg btn-primary rounded-pill" style="background-color: #a88b48; border: none;" href="/tasks/{{ task.id }}/edit">
+                        Bearbeiten
+                        </a>
+                        <a type="button" class="btn btn-lg btn-primary rounded-pill" style="background-color: #a88b48; border: none;" href="/tasks/{{ task.id }}/finish">
+                        Beenden
                         </a>
                     </div>
                 {% endif %}

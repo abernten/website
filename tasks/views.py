@@ -1,14 +1,17 @@
-from django.shortcuts import render
+from django.views import View
+from django.shortcuts import render, redirect
+from django.contrib import messages
 
 from .models import Category, Task
 from erntehelfer.models import LicenseClass, CompanyProfile, CitizenProfile
+from interests.models import InterestOffer
 
 from .forms import TaskForm
 
 class TaskListView(View):
     def get(self, request):
         categories = Category.objects.all()
-        tasks = Task.objects.all()
+        tasks = Task.objects.filter(done=False)
         licenses = LicenseClass.objects.all()
 
         return render(request, 'tasks/list.html', {
@@ -81,3 +84,25 @@ class EditTaskView(View):
             })
         else:
             return redirect('/dashboard')
+
+class FinishTaskView(View):
+
+    def get(self, request, id):
+        task = Task.objects.get(pk=id)
+        task.done = True
+        task.save()
+        messages.success(request, 'Die Aufgabe wurde erfolgreich beendet!', extra_tags='alert-success')
+        return redirect('/dashboard')
+
+class ParticipateTaskView(View):
+
+    def get(self, request, id):
+        task = Task.objects.get(pk=id)
+
+        interested = InterestOffer()
+        interested.task = task
+        interested.citizen = CitizenProfile.objects.get(owner__id=request.user.id)
+        interested.save()
+
+        messages.success(request, 'Die Aufgabe wurde erfolgreich markiert!',extra_tags='alert-success')
+        return redirect('/dashboard')

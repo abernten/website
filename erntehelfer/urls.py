@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from django.views.generic import TemplateView
 
 from .views import *
@@ -24,15 +24,11 @@ urlpatterns = [
     path('settings/user', SettingsUserView.as_view()),
 
     # Tasks
-    path('tasks', TaskListView.as_view()),
-    path('tasks/edit/<int:id>', EditTaskView.as_view()),
-    path('tasks/create', CreateTaskView.as_view()),
-    path('tasks/<int:id>', TaskView.as_view()),
+    path('tasks/', include('tasks.urls')),
+
+    # Interests
+    path('interests/', include('interests.urls')),
 
     # Dashboard
     path('dashboard', DashboardView.as_view()),
-
-    # Interested
-    path('interests', InterestOfferView.as_view())
 ]
-
