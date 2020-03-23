@@ -1,54 +1,42 @@
 {% extends 'layout.html' %}
 {% load static %}
 
-{% block styles %}
-{{ block.super }}
-
-<link href="{% static 'css/list.css' %}" rel="stylesheet">
-<link href="{% static 'css/background.css' %}" rel="stylesheet">
-{% endblock %}
-
 {% block content %}
 {% include 'components/navbar.html' %}
 
+<div class="header text-center" style="background-image: url('{% static 'img/richard-bell-vpfEhvI5UE4-unsplash.jpg' %}')">
+  <div class="container-fluid">
+    <h2 style="font-weight: 300 !important;">Alle Angebote</h2>
+  </div>
+</div>
+
 <div class="bg1">
   <div class="container my-3">
-    <nav>
-      <ol class="breadcrumb mb-1">
-        <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-        <li class="breadcrumb-item active">Aufgabenliste</li>
-      </ol>
-    </nav>
 
-    <div class="card my-1">
-      <h5 class="card-header">
-        Suchen
-      </h5>
+    <!-- Filteroptionen -->
+    <div class="card my-4 shadow bg-light">
       <div class="card-body">
-
         <div class="row">
-          <div class="col">
-
+          <div class="col-12 col-sm-6 col-lg mb-3 mb-lg-0">
+            <!-- Filter: Ort -->
             <div class="input-group">
               <div class="input-group-prepend">
                 <label class="input-group-text" for="location">Ort</label>
               </div>
               <input type="text" name="location" id="location" class="form-control" placeholder="Bsp.: Berlin, Nürnberg, ...">
             </div>
-
           </div>
-          <div class="col">
-
+          <div class="col-12 col-sm-6 col-lg mb-3 mb-lg-0">
+            <!-- Filter: Radius -->
             <div class="input-group">
               <div class="input-group-prepend">
                 <label class="input-group-text" for="location_radius">Umkreis (km)</label>
               </div>
               <input type="text" name="location_radius" id="location_radius" class="form-control" placeholder="-">
             </div>
-
           </div>
-          <div class="col">
-
+          <div class="col-12 col-sm-8 col-lg mb-3 mb-sm-0">
+            <!-- Filter: Kategorien -->
             <div class="input-group">
               <div class="input-group-prepend">
                 <label class="input-group-text" for="category">Kategorie</label>
@@ -61,20 +49,27 @@
                 {% endfor %}
               </select>
             </div>
-
+          </div>
+          <div class="col-12 col-sm col-lg-1">
+            <button class="btn btn-block btn-secondary">
+              <i class="fas fa-search fa-fw"></i>
+            </button>
           </div>
         </div>
-
       </div>
     </div>
 
-    <table class="table table-light table-striped my-1">
+    {% for task in tasks %}
+
+    {% endfor %}
+
+    <table class="table table-bordered my-4 rounded">
       <thead class="thead-light">
         <tr>
           <th style="width: 45%">Titel</th>
-          <th style="width: 10%">Ort</th>
-          <th style="width: 20%">Betriebsname</th>
-          <th style="width: 20%">Hilf mit!</th>
+          <th style="width: 10%">Postleitzahl</th>
+          <th style="width: 20%">Betrieb</th>
+          <th style="width: 20%"></th>
         </tr>
       </thead>
       <tbody>
@@ -85,7 +80,7 @@
             <td class="align-middle">{% firstof task.zip_code '-' %}</td>
             <td class="align-middle">{{ task.company.company_name }}</td>
             <td class="align-middle">
-              <a class="btn btn-light rounded" href="/tasks/{{ task.id }}">
+              <a class="btn btn-outline-secondary rounded" href="/tasks/{{ task.id }}">
                 <i class="far fa-eye"></i>
                 Details zur Aufgabe
               </a>

@@ -30,9 +30,14 @@ class TaskView(View):
 
         is_helfer = request.user.groups.filter(name__in=['Helfer']).exists()
         is_owner = False
+        is_participating = False
+
         if request.user.groups.filter(name__in=['Betrieb']).exists():
             company = CompanyProfile.objects.get(owner__id=request.user.id)
             is_owner = task.company.id == company.id
+
+        if request.user.groups.filter(name__in=['Helfer']).exists():
+            is_participating = InterestOffer.objects.filter(task__id=id, citizen__owner__id=request.user.id).exists()
 
         return render(request, 'tasks/task.html', {
             'categories': categories,
@@ -40,7 +45,8 @@ class TaskView(View):
             'task': task,
             'licenses': licenses,
             'is_helfer': is_helfer,
-            'is_owner': is_owner
+            'is_owner': is_owner,
+            'is_participating': is_participating
         })
 
 class CreateTaskView(View):
@@ -54,7 +60,7 @@ class CreateTaskView(View):
             'licenses': licenses
             })
         else:
-            return redirect('/dashboard')
+            return redirect('/')
 
     def post(self, request):
         company = CompanyProfile.objects.get(owner__id=request.user.id)
@@ -78,12 +84,35 @@ class EditTaskView(View):
 
         if request.user.groups.filter(name__in=['Betrieb']).exists():
             return render(request, 'tasks/edit.html', {
-            'categories': categories,
-            'licenses': licenses,
-            'task': task
+                'categories': categories,
+                'licenses': licenses,
+                'task': task
             })
         else:
-            return redirect('/dashboard')
+            return redirect('/')
+
+    def post(self, request, id):
+        if request.user.groups.filter(name__in=['Betrieb']).exists():
+
+            task = Task.objects.get(pk=id)
+
+            form = TaskForm(request.POST, instance=task)
+
+            if form.is_valid():
+                form.save()
+
+                # task.title = form.cleaned_data['title']
+                # task.category = Category.objects.get(pk=form.cleaned_data['category'])
+                # task.drivers_licenses.set(form.cleaned_data['drivers_licenses'])
+                # task.start_date = form.cleaned_data['start_date']
+                # task.end_date = form.cleaned_data['end_date']
+                # task.zip_code = form.cleaned_data['zip_code']
+                # task.description = form.cleaned_data['description']
+                # task.save()
+
+            return redirect('/tasks/{}'.format(id))
+        else:
+            return redirect('/')
 
 class FinishTaskView(View):
 
@@ -92,7 +121,7 @@ class FinishTaskView(View):
         task.done = True
         task.save()
         messages.success(request, 'Die Aufgabe wurde erfolgreich beendet!', extra_tags='alert-success')
-        return redirect('/dashboard')
+        return redirect('/')
 
 class ParticipateTaskView(View):
 
@@ -105,4 +134,4 @@ class ParticipateTaskView(View):
         interested.save()
 
         messages.success(request, 'Die Aufgabe wurde erfolgreich markiert!',extra_tags='alert-success')
-        return redirect('/dashboard')
+        return redirect('/')

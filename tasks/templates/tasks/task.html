@@ -62,7 +62,7 @@
                     </tbody>
                 </table>
 
-                {% if is_helfer %}
+                {% if is_helfer and not is_participating %}
                     <div class="text-center my-3">
                         <a type="button" class="btn btn-lg btn-primary rounded-pill" style="background-color: #a88b48; border: none;" href="/tasks/{{ task.id }}/participate">
                         Mitmachen!

@@ -38,20 +38,7 @@
                             Ich helfe bei:
                         </h5>
                         <div class="card-body">
-                            <ul class="list-group">
-                                {% for interest in approved_interests %}
-                                    <li class="list-group-item">
-                                        <p class="font-weight-bold">
-                                            {{ interest.task.title }}
-                                            <a class="btn btn-sm rounded-pill float-right" style="background-color: #a88b48; border: none;" href="/tasks/{{ interest.task.id }}">
-                                                <i class="far fa-eye"></i>
-                                                Aufgabe öffnen
-                                            </a>
-                                        </p>
-                                        <p> Beschreibung: {{ interest.task.description }} </p>
-                                    </li>
-                                {% endfor %}
-                            </ul>
+                            <!-- TODO! Card Body implementieren -->
                         </div>
                     </div>
                 </div>

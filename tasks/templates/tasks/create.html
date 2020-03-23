@@ -32,7 +32,7 @@
                         <tbody>
                             <tr>
                                 <td class="col-3">Titel:</td>
-                                <td><input name="title" class="form-control" required></input></td>
+                                <td><input name="title" class="form-control" required></td>
                             </tr>
                             <tr>
                                 <td>Zeitraum:</td>
@@ -67,7 +67,7 @@
                                         <div class="input-group-prepend">
                                             <label class="input-group-text" for="drivers_licenses">Führerschein</label>
                                         </div>
-                                        <select name="drivers_licenses" multiple data-style="bg-white" class="selectpicker border rounded" id="drivers_licenses">
+                                        <select name="drivers_licenses[]" multiple data-style="bg-white" class="selectpicker border rounded" id="drivers_licenses" >
                                         <!-- Führerscheinklassen -->
                                         {% for license in licenses %}
                                             <option value="{{ license.id }}">{{ license.class_name }}</option>
@@ -81,7 +81,7 @@
                                 <td>
                                     <div class="input-group my-1">
                                         <div class="input-group-prepend">
-                                        <label class="input-group-text" for="category">Kategorie</label>
+                                            <label class="input-group-text" for="category">Kategorie</label>
                                         </div>
                                         <select name="category" class="selectpicker border rounded" id="category" required>
                                         <!-- Kategorien -->

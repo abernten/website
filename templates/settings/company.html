@@ -19,59 +19,55 @@
             </ol>
           </nav>
         <div class="card">
-                <form method="post" action="">
-                    <h2>Firmenprofil aktualisieren</h2>
-                    <br />
-                    <table class="table">
-                        <tbody>
-                            <tr>
-                                <td class="col-3">Firmenname:</td>
-                                <td><input name="company_name" class="form-control" required></input></td>
-                            </tr>
-                            <tr>
-                                <td class="col-3">Adresse:</td>
-                                <td><input name="street_1" class="form-control" required></input></td>
-                            </tr>
-                            <tr>
-                                <td class="col-3">Adresszusatz:</td>
-                                <td><input name="street_1" class="form-control" required></input></td>
-                            </tr>
-                            <tr>
-                                <td class="col-3">Postleitzahl:</td>
-                                <td><input name="zip_code" class="form-control" required></input></td>
-                            </tr>
-                            <tr>
-                                <td class="col-3">Ort:</td>
-                                <td><input name="city" class="form-control" required></input></td>
-                            </tr>
-                            <tr>
-                                <td class="col-3">Land:</td>
-                                <td><input name="country" class="form-control" required></input></td>
-                            </tr>
+            <form method="post" action="">
+                <h2>Firmenprofil aktualisieren</h2>
+                <br />
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <td class="col-3">Firmenname:</td>
+                            <td><input name="company_name" class="form-control" value="{{company.company_name}}" required></td>
+                        </tr>
+                        <tr>
+                            <td class="col-3">Adresse:</td>
+                            <td><input name="street" class="form-control" value="{{company.street}}" required></td>
+                        </tr>
+                        <tr>
+                            <td class="col-3">Postleitzahl:</td>
+                            <td><input name="zip_code" class="form-control" value="{{company.zip_code}}" required></td>
+                        </tr>
+                        <tr>
+                            <td class="col-3">Ort:</td>
+                            <td><input name="city" class="form-control" value="{{company.city}}" required></td>
+                        </tr>
+                        <tr>
+                            <td class="col-3">Land:</td>
+                            <td><input name="country" class="form-control" value="{{company.country}}" required></td>
+                        </tr>
 
-                            <tr>
-                                <td class="col-3">Telefonnummer:</td>
-                                <td><input name="phone" class="form-control" required></input></td>
-                            </tr>
+                        <tr>
+                            <td class="col-3">Telefonnummer:</td>
+                            <td><input name="phone" class="form-control" value="{{company.owner.phone}}" required></td>
+                        </tr>
 
-                            <tr>
-                                <td>Firmenbeschreibung: </td>
-                                <td><textarea name="description" class="form-control" rows="3" placeholder="Geben Sie eine Beschreibung Ihres Betriebs ein" required></textarea></td>
-                            </tr>
-                            <tr>
-                                <td>Betriebsnummer (optional): </td>
-                                <td><input name="company_number" class="form-control" rows="3" placeholder="Geben Sie die Betriebsnummer ein (optional)"></input></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                        <tr>
+                            <td>Firmenbeschreibung: </td>
+                            <td><textarea name="description" class="form-control" rows="3" placeholder="Geben Sie eine Beschreibung ihres Betriebes ein" required>{{company.description}}</textarea></td>
+                        </tr>
+                        <tr>
+                            <td>Betriebsnummer (optional): </td>
+                            <td><input name="company_number" class="form-control" rows="3" placeholder="Geben Sie die Betriebsnummer ein (optional)" value="{{company.company_number}}"></td>
+                        </tr>
+                    </tbody>
+                </table>
 
-                    {% csrf_token %}
+                {% csrf_token %}
 
-                    <div class="text-center my-3">
-                        <button type="submit" class="btn btn-lg btn-primary rounded-pill" style="background-color: #a88b48; border: none;">Speichern
-                        </button>
-                    </div>
-                </form>
+                <div class="text-center my-3">
+                    <button type="submit" class="btn btn-lg btn-primary rounded-pill" style="background-color: #a88b48; border: none;">Speichern
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 

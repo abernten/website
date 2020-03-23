@@ -6,15 +6,13 @@ from django.contrib import messages
 from django.contrib.auth.models import Group
 
 from .models import CompanyProfile, CitizenProfile, LicenseClass, User
-from .forms import RegisterCitizenForm, RegisterCompanyForm
+from .forms import RegisterCitizenForm, RegisterCompanyForm, SettingsUserForm, SettingsCitizenForm, SettingsCompanyForm
 from interests.models import InterestOffer
 from tasks.models import Task, Category
 
 class IndexView(View):
 
     def get(self, request):
-        if request.user.is_authenticated:
-            return redirect('/dashboard')
         return render(request, 'index.html')
 
 class LoginView(View):
@@ -36,7 +34,7 @@ class LoginView(View):
         if user is not None:
             if user.is_active:
                 login(request, user)
-                return redirect('/dashboard')
+                return redirect('/')
             else:
                 messages.error(request, 'Benutzer wurde deaktiviert')
                 return render(request, 'registration/login.html')
@@ -87,7 +85,7 @@ class RegisterCitizenView(View):
             login(request, user)
 
             messages.success(request, 'Benutzerkonto wurde erfolgreich erstellt!', extra_tags='alert-success')
-            return redirect('/dashboard')
+            return redirect('/')
         else:
             messages.error(request, 'Ein Fehler ist aufgetreten. Bitte überprüfe deine Eingaben!', extra_tags='alert-danger')
             return render(request, 'registration/register-citizen.html', {
@@ -128,6 +126,7 @@ class SettingsView(View):
 
     def get(self, request):
         if request.user.groups.filter(name__in=['Helfer']).exists():
+            #citizen
             citizen = CitizenProfile.objects.get(owner__id=request.user.id)
             licenses = LicenseClass.objects.all()
             return render(request, 'settings/citizen.html', {
@@ -135,34 +134,69 @@ class SettingsView(View):
                 'licenses': licenses
             })
         else:
-            return render(request, 'settings/company.html')
+            #company
+            company = CompanyProfile.objects.get(owner__id=request.user.id)
+            return render(request, 'settings/company.html',{
+                'company': company
+            })
+
+    def post(self, request):
+        if request.user.groups.filter(name__in=['Helfer']).exists():
+            #citizen
+            form = SettingsCitizenForm(request.POST)
+
+            citizen = CitizenProfile.objects.get(owner__id=request.user.id)
+            licenses = LicenseClass.objects.all()
+
+            if form.is_valid():
+                citizen.description = form.cleaned_data['description']
+                citizen.drivers_licenses.set(form.cleaned_data['drivers_licenses'])
+                citizen.date_of_birth = form.cleaned_data['date_of_birth']
+                citizen.save()
+            return render(request, 'settings/citizen.html', {
+                'citizen': citizen,
+                'licenses': licenses
+            })
+        else:
+            #company
+            form = SettingsCompanyForm(request.POST)
+            company = CompanyProfile.objects.get(owner__id=request.user.id)
+
+            if form.is_valid():
+                company.description = form.cleaned_data['description']
+                company.street = form.cleaned_data['street']
+                company.zip_code = form.cleaned_data['zip_code']
+                company.city = form.cleaned_data['city']
+                company.country = form.cleaned_data['country']
+                company.owner.phone = form.cleaned_data['phone']
+                company.company_number = form.cleaned_data['company_number']
+                company.company_name = form.cleaned_data['company_name']
+                company.save()
+
+            return render(request, 'settings/company.html',{
+                'company': company
+            })
 
 class SettingsUserView(View):
 
     def get(self, request):
-        return render(request, 'settings/user.html')
+        user = request.user
 
-class DashboardView(LoginRequiredMixin, View):
-    login_url = '/accounts/login/'
+        return render(request, 'settings/user.html',{
+            'user': user
+        })
 
-    def get(self, request):
-        if request.user.groups.filter(name__in=['Helfer']).exists():
-            citizen = CitizenProfile.objects.get(owner__id=request.user.id)
-            interests = InterestOffer.objects.filter(citizen__id=citizen.id, task__done=False).order_by('-changed_at')
-            approved_interests = InterestOffer.objects.filter(citizen__id=citizen.id, task__done=False, state=1)
-            # Citizen
-            return render(request, 'dashboard/citizen.html', {
-                # 'citizen': citizen,
-                'interests': interests,
-                'approved_interests': approved_interests
-            })
-        else:
-            company = CompanyProfile.objects.get(owner__id=request.user.id)
-            tasks = Task.objects.filter(company__id=company.id, done=False)
-            interests = InterestOffer.objects.filter(task__company__id=company.id, task__done=False)
+    def post(self, request):
+        user = request.user
+        form = SettingsUserForm(request.POST)
 
-            # Company
-            return render(request,'dashboard/company.html', {
-                'tasks': tasks,
-                'interests': interests
-            })
+        if form.is_valid():
+            user.phone = form.cleaned_data['phone']
+            user.first_name = form.cleaned_data['first_name']
+            user.last_name = form.cleaned_data['last_name']
+            user.email = form.cleaned_data['email']
+            user.save()
+
+        return render(request, 'settings/user.html',{
+            'user': user
+        })

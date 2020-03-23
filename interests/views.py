@@ -39,7 +39,7 @@ class AcceptInterestView(View):
             messages.success(request, 'Die Kontaktdaten werden an den Interessenten versendet!',extra_tags='alert-success')
             return redirect('/interests')
         else:
-            return redirect('/dashboard')
+            return redirect('/')
 
 class DeclineInterestView(View):
 
@@ -53,5 +53,5 @@ class DeclineInterestView(View):
             messages.success(request, 'Die Kontaktdaten werden an den Interessenten versendet!',extra_tags='alert-success')
             return redirect('/interests')
         else:
-            return redirect('/dashboard')
+            return redirect('/')
 
