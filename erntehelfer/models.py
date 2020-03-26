@@ -1,8 +1,15 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
+import requests
+
+from geopy.distance import geodesic
+
 class User(AbstractUser):
     phone = models.CharField(max_length=250, blank=True, null=True)
+
+    def is_helfer(self):
+        return self.groups.filter(name__in=['Helfer']).exists()
 
 class CompanyProfile(models.Model):
     class Meta:
@@ -21,12 +28,35 @@ class CompanyProfile(models.Model):
     zip_code = models.CharField(max_length=16, blank=True, null=True)
     city     = models.CharField(max_length=250, blank=True, null=True)
     country  = models.CharField(max_length=2, blank=True, null=True) # Zweistelliger Laendercode
+    longitude = models.DecimalField(max_digits=12, decimal_places=8, blank=True, null=True)
+    latitude  = models.DecimalField(max_digits=12, decimal_places=8, blank=True, null=True)
 
     # Betriebsbeschreibung
     description = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.company_name
+
+    def find_coordinates(self):
+        response = requests.get('https://nominatim.openstreetmap.org/search', params={
+            'format': 'json',
+            'country': 'germany',
+            'postalcode': self.zip_code
+        })
+
+        if not response.status_code == requests.codes.ok:
+            return False
+
+        places = response.json()
+        if len(places) > 0:
+            place = places[0]
+            self.longitude = place['lon']
+            self.latitude = place['lat']
+            return True
+        return False
+
+    def in_radius(self, cords, radius):
+        return geodesic((self.longitude, self.latitude), cords).km < radius
 
 class CitizenProfile(models.Model):
     class Meta:

@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'crispy_forms',
     'erntehelfer',
     'tasks',
     'interests',
@@ -132,5 +133,9 @@ AUTH_USER_MODEL = 'erntehelfer.User'
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 
-
+# Crispy forms
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+CRISPY_CLASS_CONVERTERS = {
+    # Wegen selectpicker
+    'selectmultiple': 'selectmultiple selectpicker form-control'
+}

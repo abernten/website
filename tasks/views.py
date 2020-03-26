@@ -1,118 +1,123 @@
 from django.views import View
-from django.shortcuts import render, redirect
+from django.views.generic import CreateView, UpdateView
+from django import forms
+from django.core.paginator import Paginator
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 
-from .models import Category, Task
+from .nominatim import find_coordinates
+
+from .models import Category, Task, TaskOffer
 from erntehelfer.models import LicenseClass, CompanyProfile, CitizenProfile
 from interests.models import InterestOffer
 
-from .forms import TaskForm
+from .forms import TaskForm, ApplyForm
 
 class TaskListView(View):
+    """
+    Zeigt eine Liste mit allen offenen Angeboten an
+    """
+
     def get(self, request):
-        categories = Category.objects.all()
-        tasks = Task.objects.filter(done=False)
-        licenses = LicenseClass.objects.all()
+        # Query
+        q = Task.objects.filter(done=False)
+
+        # Search parameter
+        cat = request.GET.get('cat')
+        if cat and not cat == '0':
+            q = q.filter(category__id=cat)
+
+        # Radius
+        # Hier wäre eventuell GeoDjango sinnvoll (TODO für später)
+        r = request.GET.get('r')
+        loc = request.GET.get('loc')
+        if loc:
+            try:
+                r = int(r)
+            except:
+                r = 50
+            cords = find_coordinates(loc)
+            filtered_tasks = [task.id for task in q if task.in_radius(cords, r)]
+            q = q.filter(id__in=filtered_tasks)
+
+        # Order by start_date
+        q = q.order_by('start_date')
+
+        # Task paginator
+        paginator = Paginator(q, 5)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
 
         return render(request, 'tasks/list.html', {
-            'categories': categories,
-            'tasks': tasks,
-            'licenses': licenses
+            'task_count': paginator.count,
+            'num_pages': paginator.num_pages,
+            'page_obj': page_obj,
+            'categories': Category.objects.all(),
+            'licenses': LicenseClass.objects.all(),
+            'radius': r
         })
 
 class TaskView(View):
+    """
+    Zeigt ein bestimmtes Angebot an
+    """
 
     def get(self, request, id):
         task = Task.objects.get(pk=id)
         licenses = task.drivers_licenses.all()
         categories = Category.objects.all()
-        companies = CompanyProfile.objects.all()
 
-        is_helfer = request.user.groups.filter(name__in=['Helfer']).exists()
+        # Is requesting user owner of this task?
         is_owner = False
+        if request.user.is_authenticated and not request.user.is_helfer():
+            is_owner = task.company.owner.id == request.user.id
+
+        # Is requesting user participating in this task?
         is_participating = False
-
-        if request.user.groups.filter(name__in=['Betrieb']).exists():
-            company = CompanyProfile.objects.get(owner__id=request.user.id)
-            is_owner = task.company.id == company.id
-
-        if request.user.groups.filter(name__in=['Helfer']).exists():
-            is_participating = InterestOffer.objects.filter(task__id=id, citizen__owner__id=request.user.id).exists()
+        if request.user.is_authenticated and request.user.is_helfer():
+            is_participating = InterestOffer.objects.filter(task__id=task.id, citizen__owner__id=request.user.id).exists()
 
         return render(request, 'tasks/task.html', {
-            'categories': categories,
-            'companies': companies,
             'task': task,
             'licenses': licenses,
-            'is_helfer': is_helfer,
+            'categories': Category.objects.all(),
+
             'is_owner': is_owner,
             'is_participating': is_participating
         })
 
-class CreateTaskView(View):
-    def get(self, request):
-        licenses = LicenseClass.objects.all()
-        categories = Category.objects.all()
+class CreateTaskView(CreateView):
+    model = Task
+    template_name = 'tasks/create.html'
+    form_class = TaskForm
 
-        if request.user.groups.filter(name__in=['Betrieb']).exists():
-            return render(request, 'tasks/create.html', {
-            'categories': categories,
-            'licenses': licenses
-            })
-        else:
-            return redirect('/')
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
 
-    def post(self, request):
-        company = CompanyProfile.objects.get(owner__id=request.user.id)
-        form = TaskForm(request.POST)
+        # Company profile vor dem Speichern hinzufügen
+        self.object.company = CompanyProfile.objects.get(owner__id=self.request.user.id)
 
-        if form.is_valid():
-            task = form.save(commit=False)
-            task.company = company
-            task.save()
-            return redirect('/tasks/{}'.format(task.id))
-        else:
-            messages.error(request, 'Bitte überprüfen Sie noch einmal die Eingabe!')
-            return render(request, 'tasks/create.html', {'form': form})
+        # Koordinaten berechnen und speichern
+        if not self.object.find_coordinates():
+            # TODO: Message ausgeben
+            return self.form_invalid(form)
 
-class EditTaskView(View):
+        return super(CreateTaskView, self).form_valid(form)
 
-    def get(self, request, id):
-        task = Task.objects.get(pk=id)
-        licenses = LicenseClass.objects.all()
-        categories = Category.objects.all()
+class EditTaskView(UpdateView):
+    model = Task
+    template_name = 'tasks/edit.html'
+    form_class = TaskForm
 
-        if request.user.groups.filter(name__in=['Betrieb']).exists():
-            return render(request, 'tasks/edit.html', {
-                'categories': categories,
-                'licenses': licenses,
-                'task': task
-            })
-        else:
-            return redirect('/')
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
 
-    def post(self, request, id):
-        if request.user.groups.filter(name__in=['Betrieb']).exists():
+        # Koordinaten berechnen und speichern
+        if not self.object.find_coordinates():
+            # TODO: Message ausgeben
+            return self.form_invalid(form)
 
-            task = Task.objects.get(pk=id)
-
-            form = TaskForm(request.POST, instance=task)
-
-            if form.is_valid():
-                form.save()
-
-                # task.title = form.cleaned_data['title']
-                # task.category = Category.objects.get(pk=form.cleaned_data['category'])
-                # task.drivers_licenses.set(form.cleaned_data['drivers_licenses'])
-                # task.start_date = form.cleaned_data['start_date']
-                # task.end_date = form.cleaned_data['end_date']
-                # task.zip_code = form.cleaned_data['zip_code']
-                # task.description = form.cleaned_data['description']
-                # task.save()
-
-            return redirect('/tasks/{}'.format(id))
-        else:
-            return redirect('/')
+        return super(EditTaskView, self).form_valid(form)
 
 class FinishTaskView(View):
 
@@ -126,7 +131,19 @@ class FinishTaskView(View):
 class ParticipateTaskView(View):
 
     def get(self, request, id):
+        # Nur Helfer dürfen mitmachen
+        if not request.user.is_helfer():
+            return redirect('/')
+
         task = Task.objects.get(pk=id)
+
+        # Fehlermeldung anzeigen wenn bereits mitgemacht wird
+        is_participating = False
+        if request.user.is_helfer():
+            is_participating = InterestOffer.objects.filter(task__id=id, citizen__owner__id=request.user.id).exists()
+            if is_participating:
+                messages.error(request, 'Du hast bereits das Angebot markiert! Bitte warte auf eine Antwort vom Betrieb.', extra_tags='alert-danger')
+                return redirect(task.get_absolute_url())
 
         interested = InterestOffer()
         interested.task = task
@@ -134,4 +151,19 @@ class ParticipateTaskView(View):
         interested.save()
 
         messages.success(request, 'Die Aufgabe wurde erfolgreich markiert!',extra_tags='alert-success')
-        return redirect('/')
+        return redirect(task.get_absolute_url())
+
+class ApplyTaskView(CreateView):
+    model = TaskOffer
+    template_name = 'tasks/apply.html'
+    form_class = ApplyForm
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+
+        task = get_object_or_404(Task, pk=self.kwargs['id'])
+        self.object.task = task
+
+        messages.success(self.request, 'Vielen Dank, dass du deine Hilfe anbietest! Du erhälst demnächst eine Antwort vom Betrieb.', extra_tags='alert-success')
+
+        return super(ApplyTaskView, self).form_valid(form)

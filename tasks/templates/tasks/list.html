@@ -1,94 +1,137 @@
 {% extends 'layout.html' %}
 {% load static %}
 
+{% block title %}Alle Angebote auf einem Blick{% endblock %}
+
 {% block content %}
 {% include 'components/navbar.html' %}
 
 <div class="header text-center" style="background-image: url('{% static 'img/richard-bell-vpfEhvI5UE4-unsplash.jpg' %}')">
-  <div class="container-fluid">
-    <h2 style="font-weight: 300 !important;">Alle Angebote</h2>
-  </div>
-</div>
-
-<div class="bg1">
-  <div class="container my-3">
+  <div class="container">
+    <h2 style="font-weight: 300 !important;" class="mb-5 d-block">Alle Angebote</h2>
 
     <!-- Filteroptionen -->
     <div class="card my-4 shadow bg-light">
       <div class="card-body">
-        <div class="row">
-          <div class="col-12 col-sm-6 col-lg mb-3 mb-lg-0">
-            <!-- Filter: Ort -->
-            <div class="input-group">
-              <div class="input-group-prepend">
-                <label class="input-group-text" for="location">Ort</label>
+        <form method="GET" action="">
+          <div class="row">
+            <div class="col-12 col-sm-6 col-lg mb-3 mb-lg-0">
+              <!-- Filter: Ort -->
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <label class="input-group-text" for="location">Ort</label>
+                </div>
+                <input type="text" name="loc" id="location" class="form-control" placeholder="Bsp.: Berlin, Nürnberg, ..." {% if request.GET.loc %}value="{{ request.GET.loc }}"{% endif %}>
               </div>
-              <input type="text" name="location" id="location" class="form-control" placeholder="Bsp.: Berlin, Nürnberg, ...">
+            </div>
+            <div class="col-12 col-sm-6 col-lg mb-3 mb-lg-0">
+              <!-- Filter: Radius -->
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <label class="input-group-text" for="location_radius">Umkreis (km)</label>
+                </div>
+                <input type="text" name="r" id="location_radius" class="form-control" placeholder="50" {% if radius %}value="{{ radius }}"{% endif %}>
+              </div>
+            </div>
+            <div class="col-12 col-sm-8 col-lg mb-3 mb-sm-0">
+              <!-- Filter: Kategorien -->
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <label class="input-group-text" for="category">Kategorie</label>
+                </div>
+                <select class="custom-select" name="cat" id="category" length="400px">
+                  <!-- Liste der verfügbaren Kategorien -->
+                  <option value="0">Alles</option>
+                  {% for c in categories %}
+                    <option value="{{ c.id }}" {% ifequal c.id|stringformat:'s' request.GET.cat %}selected{% endifequal %}>{{ c.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col-12 col-sm col-lg-1">
+              <button type="submit" class="btn btn-block btn-secondary">
+                <i class="fas fa-search fa-fw"></i>
+              </button>
             </div>
           </div>
-          <div class="col-12 col-sm-6 col-lg mb-3 mb-lg-0">
-            <!-- Filter: Radius -->
-            <div class="input-group">
-              <div class="input-group-prepend">
-                <label class="input-group-text" for="location_radius">Umkreis (km)</label>
-              </div>
-              <input type="text" name="location_radius" id="location_radius" class="form-control" placeholder="-">
-            </div>
-          </div>
-          <div class="col-12 col-sm-8 col-lg mb-3 mb-sm-0">
-            <!-- Filter: Kategorien -->
-            <div class="input-group">
-              <div class="input-group-prepend">
-                <label class="input-group-text" for="category">Kategorie</label>
-              </div>
-              <select class="custom-select" name="category" id="category" length="400px">
-                <!-- Liste der verfügbaren Kategorien -->
-                <option value="0">Alles</option>
-                {% for c in categories %}
-                  <option value="{{ c.id }}">{{ c.name }}</option>
-                {% endfor %}
-              </select>
-            </div>
-          </div>
-          <div class="col-12 col-sm col-lg-1">
-            <button class="btn btn-block btn-secondary">
-              <i class="fas fa-search fa-fw"></i>
-            </button>
-          </div>
-        </div>
+        </form>
       </div>
     </div>
+  </div>
+</div>
 
-    {% for task in tasks %}
+<div class="container py-4">
+  <div class="task-list">
+    <h4 class="mb-5"><strong>{{ task_count }}</strong> Ergebnisse gefunden</h4>
+
+    {% for task in page_obj %}
+
+    <a href="/tasks/{{ task.id }}" class="task">
+    <div class="card my-4 d-block">
+
+      <div class="row">
+        <div class="col mx-3 py-3">
+          <h5 class="card-title"><strong>{{ task.title }}</strong></h5>
+          <h6>{{ task.company.company_name }}</h6>
+
+          <p class="text-secondary my-3">
+            {{ task.description | truncatechars:250 }}
+          </p>
+
+          <small class="text-muted">
+            Zeitraum vom {{ task.start_date }} bis {{ task.end_date }}
+          </small>
+        </div>
+
+        <div class="col mx-3 py-3 bg-light">
+
+          <div class="row">
+            <div class="col-12 col-lg">
+              <p>
+                <small class="text-muted">Benötigte Helfer:</small><br>
+                {{ task.helpers_count }}<br><br>
+                <small class="text-muted">Postleitzahl:</small><br>
+                {{ task.zip_code }}
+              </p>
+            </div>
+            <div class="col-12 col-lg">
+              <small class="text-muted">Kategorie:</small><br>
+              {{ task.category.name }}<br><br>
+              <small class="text-muted">Führerscheinklassen:</small><br>
+              {% if not task.drivers_licenses.all.exists %}
+                -/-
+              {% endif %}
+              {% for license in task.drivers_licenses.all %}
+                <span class="badge badge-pill badge-success">{{ license.class_name }}</span>
+              {% endfor %}
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+    </a>
 
     {% endfor %}
+  </div>
 
-    <table class="table table-bordered my-4 rounded">
-      <thead class="thead-light">
-        <tr>
-          <th style="width: 45%">Titel</th>
-          <th style="width: 10%">Postleitzahl</th>
-          <th style="width: 20%">Betrieb</th>
-          <th style="width: 20%"></th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Liste der verfügbaren Aufgaben anzeigen-->
-        {% for task in tasks %}
-          <tr>
-            <td class="align-middle">{{ task.title }}</th>
-            <td class="align-middle">{% firstof task.zip_code '-' %}</td>
-            <td class="align-middle">{{ task.company.company_name }}</td>
-            <td class="align-middle">
-              <a class="btn btn-outline-secondary rounded" href="/tasks/{{ task.id }}">
-                <i class="far fa-eye"></i>
-                Details zur Aufgabe
-              </a>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  <div class="row justify-content-between align-items-center mt-5">
+    <div class="col text-left">
+      {% if page_obj.has_previous %}
+        <a class="btn btn-primary" href="/tasks?page={{ page_obj.previous_page_number }}">&larr; Vorherige Seite</a>
+      {% endif %}
+    </div>
+    <div class="col text-center">
+      <p class="m-0">
+        Seite {{ page_obj.number }} von {{ num_pages }}
+      </p>
+    </div>
+    <div class="col text-right">
+      {% if page_obj.has_next %}
+        <a class="btn btn-primary" href="/tasks?page={{ page_obj.next_page_number }}">Nächste Seite &rarr;</a>
+      {% endif %}
+    </div>
   </div>
 </div>
 

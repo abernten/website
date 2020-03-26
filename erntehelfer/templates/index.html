@@ -19,15 +19,41 @@
 .team-container img:hover {
   filter: grayscale(0);
 }
+
+.homepage-button:hover {
+    text-decoration: none;
+}
 </style>
 {% endblock %}
 
 {% block content %}
 {% include 'components/navbar.html' %}
 
-<div class="header text-center" style="background-image: url('{% static 'img/header-bg.jpg' %}')">
-  <div class="container-fluid">
-    <h2 style="font-weight: 300 !important;">Startseite</h2>
+<div class="header text-center" style="background-image: url('{% static 'img/header-bg.jpg' %}'); padding: 7rem 0;">
+  <div class="container">
+
+    <div class="row align-items-center">
+      <div class="col">
+        <a href="/tasks" class="homepage-button">
+          <Button class="btn btn-lg btn-block btn-light" style="height: 5rem;">
+            <i class="fas fa-fw fa-hands-helping mr-2"></i>
+            Mithelfen
+          </Button>
+        </a>
+      </div>
+      <div class="col text-center text-light">
+        <small>oder</small>
+      </div>
+      <div class="col">
+        <a href="/tasks/create" class="homepage-button">
+          <Button class="btn btn-lg btn-block btn-light" style="height: 5rem;">
+            <i class="fas fa-fw fa-search mr-2"></i>
+            Nach Helfern suchen
+          </Button>
+        </a>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -72,12 +98,12 @@
         <h5>Dennis Bruner</h5>
       </div>
       <div class="col-12 col-sm-6 col-lg mb-4 mb-lg-0">
-        <img src="{% static '/img/team/lukas-kielmann.jpg' %}" style="max-height: 130px" class="rounded-circle mb-4">
-        <h5>Lukas Kielmann</h5>
-      </div>
-      <div class="col-12 col-sm-6 col-lg mb-4 mb-lg-0">
         <img src="{% static '/img/team/jacqueline-baumueller.jpg' %}" style="max-height: 130px" class="rounded-circle mb-4">
         <h5>Jacqueline Baumüller</h5>
+      </div>
+      <div class="col-12 col-sm-6 col-lg mb-4 mb-lg-0">
+        <img src="{% static '/img/team/lukas-kielmann.jpg' %}" style="max-height: 130px" class="rounded-circle mb-4">
+        <h5>Lukas Kielmann</h5>
       </div>
     </div>
 

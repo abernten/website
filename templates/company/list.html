@@ -3,12 +3,114 @@
 
 {% block styles %}
 {{ block.super }}
-<link href="{% static 'css/background.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
 {% include 'components/navbar.html' %}
 
+<div class="header text-center" style="background-image: url('{% static 'img/richard-bell-vpfEhvI5UE4-unsplash.jpg' %}')">
+  <div class="container">
+    <h2 style="font-weight: 300 !important;" class="mb-5 d-block">Alle Betriebe</h2>
+
+    <!-- Filteroptionen -->
+    <div class="card my-4 shadow bg-light">
+      <div class="card-body">
+        <form method="GET" action="">
+          <div class="row">
+            <div class="col-12 col-sm-6 col-lg mb-3 mb-lg-0">
+              <!-- Filter: Ort -->
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <label class="input-group-text" for="location">Ort</label>
+                </div>
+                <input type="text" name="loc" id="location" class="form-control" placeholder="Bsp.: Berlin, Nürnberg, ..." {% if request.GET.loc %}value="{{ request.GET.loc }}"{% endif %}>
+              </div>
+            </div>
+            <div class="col-12 col-sm-6 col-lg mb-3 mb-lg-0">
+              <!-- Filter: Radius -->
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <label class="input-group-text" for="location_radius">Umkreis (km)</label>
+                </div>
+                <input type="text" name="r" id="location_radius" class="form-control" placeholder="50" {% if radius %}value="{{ radius }}"{% endif %}>
+              </div>
+            </div>
+            <div class="col-12 col-sm col-lg-1">
+              <button type="submit" class="btn btn-block btn-secondary">
+                <i class="fas fa-search fa-fw"></i>
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div>
+  <div class="container py-4">
+
+    <div class="task-list">
+      <h4><strong>{{ company_count }}</strong> Ergebnisse gefunden</h4>
+
+      {% for q in page_obj %}
+
+      <a href="/tasks/{{ task.id }}" class="task">
+      <div class="card my-4 d-block border-info">
+
+        <div class="row">
+          <div class="col mx-3 py-3">
+            <h5><strong>{{ q.company_name }}</strong></h5>
+            <h6>{{ q.company_number }}</h6>
+
+            <p class="text-muted mt-3">
+              {{ q.description | truncatechars:250 }}
+            </p>
+          </div>
+
+          <div class="col mx-3 col-lg-2 py-3 bg-light">
+            <div class="row">
+              <div class="col-12 ">
+                <p>
+                  <small class="text-muted">Offene Aufgaben:</small><br>
+                  {{ task.helpers_count }}<br><br>
+                  <small class="text-muted">Postleitzahl:</small><br>
+                  {{ q.zip_code }}
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+      </a>
+
+      {% endfor %}
+    </div>
+
+    <div class="row justify-content-between align-items-center">
+      <div class="col text-left">
+        {% if page_obj.has_previous %}
+          <a class="btn btn-primary" href="/companies?page={{ page_obj.previous_page_number }}">&larr; Vorherige Seite</a>
+        {% endif %}
+      </div>
+      <div class="col text-center">
+        <p class="m-0">
+          Seite {{ page_obj.number }} von {{ num_pages }}
+        </p>
+      </div>
+      <div class="col text-right">
+        {% if page_obj.has_next %}
+          <a class="btn btn-primary" href="/companies?page={{ page_obj.next_page_number }}">Nächste Seite &rarr;</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!--
 <div class="bg1">
   <div class="container my-3">
     <nav>
@@ -45,6 +147,7 @@
     </table>
   </div>
 </div>
+-->
 
 {% include 'components/footer.html' %}
 {% endblock %}

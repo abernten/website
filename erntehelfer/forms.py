@@ -9,6 +9,7 @@ class RegisterCitizenForm(Form):
     date_of_birth = forms.DateField()
     password = forms.CharField(max_length=100)
     password_2 = forms.CharField(max_length=100)
+    phone = forms.CharField(max_length=150, required=True)
 
 class RegisterCompanyForm(Form):
     username = forms.CharField(max_length=150)
@@ -17,6 +18,8 @@ class RegisterCompanyForm(Form):
     password_2 = forms.CharField(max_length=100)
     company_name = forms.CharField(max_length=250)
     company_number = forms.CharField(max_length=250, required=False)
+    phone = forms.CharField(max_length=150, required=True)
+
 
 class SettingsCitizenForm(ModelForm):
     class Meta:

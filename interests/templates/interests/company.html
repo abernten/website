@@ -1,85 +1,76 @@
 {% extends 'layout.html' %}
 {% load static %}
 
-{% block styles %}
-{{ block.super }}
-
-<link href="{% static 'css/list.css' %}" rel="stylesheet">
-<link href="{% static 'css/background.css' %}" rel="stylesheet">
-{% endblock %}
-
 {% block content %}
 {% include 'components/navbar.html' %}
 
-<div class="bg1">
-  <div class="container my-3">
-    <nav>
-      <ol class="breadcrumb mb-1">
-        <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-        <li class="breadcrumb-item active">Meine Interessenten</li>
-      </ol>
-    </nav>
-
-      {% if messages %}
-        {% for message in messages %}
-          <div class="alert {% if message.tags %}{{ message.tags }}{% endif %} my-2">
-            {{ message }}
-          </div>
-        {% endfor %}
-      {% endif %}
-
-    <table class="table table-light table-striped my-1">
-      <thead class="thead-light">
-        <tr>
-          <th style="width: 10%">Vorname</th>
-          <th style="width: 10%">Nachname</th>
-          <th style="width: 23%">Tätigkeiten</th>
-          <th style="width: 24%">Erfahrung</th>
-          <th style="width: 10%">Füherscheinklassen</th>
-          <th style="width: 13%">Datum Interesse</th>
-          <th style="width: 10%">Annehmen?</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Liste der verfügbaren Aufgaben anzeigen-->
-        {% for interest in interested %}
-          <tr>
-            <td>{{ interest.citizen.owner.first_name }}</td>
-            <td>{{ interest.citizen.owner.last_name }}</td>
-            <td>{{ interest.task.title }}</td>
-            <td>{{ interest.citizen.description }}</td>
-            <td>
-                {% for license in interest.citizen.drivers_licenses.all %}
-                    <span class="badge badge-pill badge-secondary">{{ license.class_name }}</span>
-                {% endfor %}
-            </td>
-            <td>{{ interest.created_at}}</td>
-            {% if interest.state == 0 %}
-            <td>
-              <div class="btn-group float-right">
-                <a class="btn-sm btn-success mr-2 rounded" href="/interests/{{ interest.id }}/accept">
-                  <i class="fas fa-fw fa-check"></i>
-                </a>
-                <a class="btn-sm btn-danger rounded" href="/interests/{{ interest.id }}/decline">
-                  <i class="fas fa-fw fa-times"></i>
-                </a>
-              </div>
-            </td>
-            {% elif interest.state == 1 %}
-            <td>
-              <label>Daten verschickt!</label>
-            </td>
-            {% elif interest.state == 2%}
-              <td>
-                <label>Abgelehnt!</label>
-              </td>
-            {% endif %}
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+<div class="header text-center" style="background-image: url('{% static 'img/richard-bell-vpfEhvI5UE4-unsplash.jpg' %}')">
+  <div class="container">
+    <h2 style="font-weight: 300 !important;" class="mb-5 d-block">Meine Hilfsangebote</h2>
   </div>
 </div>
+
+<div>
+  <div class="container py-4">
+
+    <div class="task-list">
+      <h4><strong>{{ helper_count }}</strong> Helfer gefunden</h4>
+
+      {% for interested in page_obj %}
+
+      <div class="card my-4 d-block border-info">
+
+        <div class="row">
+          <div class="col mx-3 py-3">
+            <h5><strong>{{ interested.citizen.owner.first_name }} {{ interested.citizen.owner.last_name}}</strong></h5>
+            <h6>{{ interested.task.title }}</h6>
+
+            <p class="text-muted mt-3">
+              {{ interested.citizen.description | truncatechars:250 }}
+            </p>
+          </div>
+
+          <div class="col mx-3 py-3 bg-light">
+            <div class="row">
+              <div class="col-12 col-lg">
+                <p>
+                  <small class="text-muted">Eingereicht am:</small><br>
+                  {{ interested.created_at }}<br><br>
+                  <small class="text-muted">Führerscheinklassen:</small><br>
+                  {% if not interested.citizen.drivers_licenses.all.exists %}
+                    -/-
+                  {% endif %}
+                  {% for license in interested.citizen.drivers_licenses.all %}
+                    <span class="badge badge-pill badge-success">{{ license.class_name }}</span>
+                  {% endfor %}
+                </p>
+              </div>
+              <div class="col-12 col-lg">
+                <p>
+                  <small class="text-muted">Status:</small><br>
+                  {{ interested.state }}<br><br>
+                  <small class="text-muted">Aktion:</small><br>
+                  {% if interested.state == 0 %}
+                      <a class="btn-sm btn-success mr-2 rounded" href="/interests/{{ interested.id }}/accept">
+                        <i class="fas fa-fw fa-check"></i>
+                      </a>
+                      <a class="btn-sm btn-danger rounded" href="/interests/{{ interested.id }}/decline">
+                        <i class="fas fa-fw fa-times"></i>
+                      </a>
+                  {% elif interested.state == 1 %}
+                  Daten verschickt!
+                  {% endif %}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
 
 {% include 'components/footer.html' %}
 {% endblock %}

@@ -1,19 +1,18 @@
 {% extends 'layout.html' %}
 {% load static %}
+{% load crispy_forms_tags %}
 
 {% block styles %}
 {{ block.super }}
-
-<link href="{% static 'css/list.css' %}" rel="stylesheet">
-<link href="{% static 'css/background.css' %}" rel="stylesheet">
+<link rel="stylesheet" href="{% static '/css/background.css' %}"
 {% endblock %}
 
 {% block content %}
 {% include 'components/navbar.html' %}
 
 <div class="bg1">
-    <div class="container my-3">
-        <nav>
+    <div class="container">
+        <nav class="my-4">
             <ol class="breadcrumb mb-1">
                 <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
                 <li class="breadcrumb-item"><a href="/tasks">Aufgabenliste</a></li>
@@ -21,83 +20,10 @@
             </ol>
           </nav>
 
-        <div class="card">
+        <div class="card my-4 shadow">
             <div class="p-3">
                 <form method="post" action="">
-                    <table class="table table-light my-1">
-                        <tbody>
-                            <tr>
-                                <td class="font-weight-bold" style="width: 25%">Titel:</td>
-                                <td>
-                                    <input name="title" class="form-control" value="{{ task.title }}" required>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Kategorie</td>
-                                <td>
-                                    <div class="input-group my-1">
-                                        <div class="input-group-prepend">
-                                            <label class="input-group-text" for="category">Kategorie</label>
-                                        </div>
-                                        <select name="category" class="selectpicker border rounded" id="category" required>
-                                        <!-- Kategorien -->
-                                        {% for category in categories %}
-                                            <option value="{{ category.id }}" {% if category.id == task.category.id %}selected{% endif %}>{{ category.name }}</option>
-                                        {% endfor %}
-                                        </select>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="font-weight-bold">Zeitraum:</td>
-                                <td>
-                                    <div class="input-group my-1">
-                                        <div class="input-group-prepend">
-                                            <label class="input-group-text" for="start_date">
-                                                <i class="fas fa-calendar-alt"></i>
-                                            </label>
-                                        </div>
-                                        <input name="start_date" value="{{ task.start_date | date:'Y-m-d' }}" type="date" class="form-control" id="start_date" required>
-                                        <label class="col-sm-auto col-form-label">bis</label>
-                                        <div class="input-group-prepend">
-                                            <label class="input-group-text" for="end_date">
-                                                <i class="fas fa-calendar-alt"></i>
-                                            </label>
-                                        </div>
-                                        <input name="end_date" value="{{task.end_date | date:'Y-m-d' }}" type="date" class="form-control" id="end_date" required>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="font-weight-bold">Benötigte Führerscheinklassen:</td>
-                                <td>
-                                    <div class="input-group my-1">
-                                        <div class="input-group-prepend">
-                                            <label class="input-group-text" for="drivers_licenses">Führerschein</label>
-                                        </div>
-                                        <select name="drivers_licenses" multiple data-style="bg-white" class="selectpicker border rounded" id="drivers_licenses">
-                                            <!-- Führerscheinklassen -->
-                                            {% for license in licenses %}
-                                                <option value="{{ license.id }}" {% if license in task.drivers_licenses.all %}selected{% endif %}>{{ license.class_name }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="font-weight-bold">Ort:</td>
-                                <td>
-                                    <input name="zip_code" class="form-control" value="{% firstof task.zip_code '-' %}" required>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="font-weight-bold">Beschreibung: </td>
-                                <td>
-                                    <textarea name="description" class="form-control" rows="3" required>{{task.description}}</textarea>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    {{ form | crispy }}
 
                     {% csrf_token %}
 
@@ -109,7 +35,6 @@
         </div>
     </div>
 </div>
-{% include 'components/footer.html' %}
 {% endblock %}
 
 {% block scripts %}

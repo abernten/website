@@ -5,6 +5,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.contrib.auth.models import Group
 
+from tasks.nominatim import find_coordinates
+from django.core.paginator import Paginator
+
 from .models import CompanyProfile, CitizenProfile, LicenseClass, User
 from .forms import RegisterCitizenForm, RegisterCompanyForm, SettingsUserForm, SettingsCitizenForm, SettingsCompanyForm
 from interests.models import InterestOffer
@@ -73,6 +76,7 @@ class RegisterCitizenView(View):
             user.username = form.cleaned_data['username']
             user.email    = form.cleaned_data['email']
             user.password = form.cleaned_data['password']
+            user.phone = form.cleaned_data['phone']
             user.save()
 
             user.groups.add(group)
@@ -100,17 +104,74 @@ class RegisterCompanyView(View):
         return render(request, 'registration/register-company.html')
 
     def post(self, request):
-        pass
+        form = RegisterCompanyForm(request.POST)
+
+        if form.is_valid():
+            if form.cleaned_data['password'] != form.cleaned_data['password_2']:
+                messages.error(request, 'Passwörter stimmen nicht überein!', extra_tags='alert-danger')
+                return render(request, 'registration/register-company.html')
+
+            group = Group.objects.get(name='Betrieb')
+
+            user = User()
+            user.username = form.cleaned_data['username']
+            user.email    = form.cleaned_data['email']
+            user.password = form.cleaned_data['password']
+            user.phone = form.cleaned_data['phone']
+            user.save()
+
+            user.groups.add(group)
+
+            company = CompanyProfile()
+            company.owner = user
+            company.company_name = form.cleaned_data['company_name']
+            company.company_number = form.cleaned_data['company_number']
+            company.save()
+
+            login(request, user)
+
+            messages.success(request, 'Benutzerkonto wurde erfolgreich erstellt!', extra_tags='alert-success')
+            return redirect('/')
+        else:
+            messages.error(request, 'Ein Fehler ist aufgetreten. Bitte überprüfe deine Eingaben!', extra_tags='alert-danger')
+            return render(request, 'registration/register-company.html', {
+                'form': form
+            })
 
 class CompanyListView(View):
 
     def get(self, request):
         categories = Category.objects.all()
-        companies = CompanyProfile.objects.all()
+
+        # Query
+        q = CompanyProfile.objects.all()
+
+        # Radius
+        # Hier wäre eventuell GeoDjango sinnvoll (TODO für später)
+        r = request.GET.get('r')
+        loc = request.GET.get('loc')
+        if loc:
+            try:
+                r = int(r)
+            except:
+                r = 50
+            cords = find_coordinates(loc)
+            filtered_companies = [company.id for company in q if company.in_radius(cords, r)]
+            q = q.filter(id__in=filtered_companies)
+
+
+
+        # Task paginator
+        paginator = Paginator(q, 5)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
 
         return render(request, 'company/list.html', {
-            'categories': categories,
-            'companies': companies
+            'q': q,
+            'radius': r,
+            'company_count': paginator.count,
+            'num_pages': paginator.num_pages,
+            'page_obj': page_obj
         })
 
 class CompanyProfileView(View):
@@ -171,6 +232,10 @@ class SettingsView(View):
                 company.owner.phone = form.cleaned_data['phone']
                 company.company_number = form.cleaned_data['company_number']
                 company.company_name = form.cleaned_data['company_name']
+
+                #calculate coordinates
+                company.find_coordinates()
+
                 company.save()
 
             return render(request, 'settings/company.html',{
@@ -200,3 +265,10 @@ class SettingsUserView(View):
         return render(request, 'settings/user.html',{
             'user': user
         })
+
+class ResetPasswordView(View):
+    def get(self,request):
+        return render(request, 'registration/reset-password.html',{
+
+        })
+

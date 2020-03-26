@@ -1,87 +1,105 @@
 {% extends 'layout.html' %}
 {% load static %}
 
-{% block styles %}
-{{ block.super }}
-
-<link href="{% static 'css/list.css' %}" rel="stylesheet">
-<link href="{% static 'css/background.css' %}" rel="stylesheet">
-{% endblock %}
+{% block title %}{{ task.title }}{% endblock %}
 
 {% block content %}
 {% include 'components/navbar.html' %}
 
-<div class="bg1">
-    <div class="container my-3">
-        <nav>
-            {% if is_helfer %}
-                <ol class="breadcrumb mb-1">
-                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="/tasks">Aufgabenliste</a></li>
-                    <li class="breadcrumb-item active">{{ task.title }}</li>
-                </ol>
-            {% elif is_owner %}
-                <ol class="breadcrumb mb-1">
-                    <li class="breadcrumb-item"><a href="/">Dashboard</a></li><li class="breadcrumb-item active">{{ task.title }}</li>
-                </ol>
-            {% endif %}
-        </nav>
+<div class="container-fluid py-4 bg-light">
+    <div class="container">
+        <a href="/tasks" class="d-block mb-4">&larr; Zurück zur Liste</a>
 
-        <div class="card">
-            <div class="p-3">
-                <table class="table table-light my-1">
-                    <tbody>
-                        <tr>
-                            <td class="font-weight-bold" style="width: 25%">Titel:</td>
-                            <td>{{ task.title }}</td>
-                        </tr>
-                        <tr>
-                            <td class="font-weight-bold">Kategorie:</td>
-                            <td>{{task.category.name}}</td>
-                        </tr>
-                        <tr>
-                            <td class="font-weight-bold">Zeitraum:</td>
-                            <td>{{ task.start_date }} bis {{ task.end_date }}</td>
-                        </tr>
-                        <tr>
-                            <td class="font-weight-bold">Benötigte Führerscheinklassen:</td>
-                            <td>
-                                {% for license in licenses %}
-                                    <span class="badge badge-pill badge-secondary">{{ license.class_name }}</span>
-                                {% endfor %}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="font-weight-bold">Ort:</td>
-                            <td>{% firstof task.zip_code '-' %}</td>
-                        </tr>
-                        <tr>
-                            <td class="font-weight-bold">Beschreibung: </td>
-                            <td>{{ task.description }}</td>
-                        </tr>
-                    </tbody>
-                </table>
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags %}{{ message.tags }}{% endif %} my-2">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
 
-                {% if is_helfer and not is_participating %}
-                    <div class="text-center my-3">
-                        <a type="button" class="btn btn-lg btn-primary rounded-pill" style="background-color: #a88b48; border: none;" href="/tasks/{{ task.id }}/participate">
-                        Mitmachen!
-                        </a>
+        <div class="row">
+            <div class="col-12 col-lg mb-4 mb-lg-0">
+                <div class="card">
+
+                    <div class="card-body">
+                        <h5 class="card-title"><strong>{{ task.title }}</strong></h5>
+
+                        <p class="text-secondary my-3">
+                            {{ task.description }}
+                        </p>
+
+                        <small class="text-muted">
+                            Zeitraum vom {{ task.start_date }} bis {{ task.end_date }}
+                        </small>
                     </div>
-                {% elif is_owner %}
-                    <div class="text-center my-3">
-                        <a type="button" class="btn btn-lg btn-primary rounded-pill" style="background-color: #a88b48; border: none;" href="/tasks/{{ task.id }}/edit">
-                        Bearbeiten
-                        </a>
-                        <a type="button" class="btn btn-lg btn-primary rounded-pill" style="background-color: #a88b48; border: none;" href="/tasks/{{ task.id }}/finish">
-                        Beenden
-                        </a>
+
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            Benötigte Helfer
+                            <p class="float-right m-0">
+                                {{ task.helpers_count }}
+                            </p>
+                        </li>
+                        <li class="list-group-item">
+                            Postleitzahl
+                            <p class="float-right m-0">
+                                {{ task.zip_code }}
+                            </p>
+                        </li>
+                        <li class="list-group-item">
+                            Kategorie
+                            <p class="float-right m-0">
+                                {{ task.category.name }}
+                            </p>
+                        </li>
+                        <li class="list-group-item">
+                            Führerscheinklassen
+                            <p class="float-right m-0">
+                            {% if not task.drivers_licenses.all.exists %}
+                                -/-
+                            {% endif %}
+                            {% for license in task.drivers_licenses.all %}
+                                <span class="badge badge-pill badge-success">{{ license.class_name }}</span>
+                            {% endfor %}
+                            </p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg col-lg-4">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title m-0">{{ task.company.company_name }}</h5>
                     </div>
-                {% endif %}
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        {% if is_participating %}
+                            <div class="alert alert-info">
+                                <strong>Du hast dein Interesse am Angebot verkündet!</strong><br><br>
+                                Gib dem Betrieb ein wenig Zeit zu entscheiden. :)
+                            </div>
+                        {% endif %}
+                        <a {% if request.user.is_authenticated and request.user.is_helfer %}href="/tasks/{{ task.id }}/participate"{% else %}href="/accounts/register-citizen"{% endif %} class="btn btn-success btn-block btn-lg {% if is_participating %}disabled{% endif %}">
+                            <i class="fas fa-hands-helping fa-fw"></i>
+                            Mitmachen
+                        </a>
+
+                        {% if is_owner %}
+                        <button class="btn btn-light btn-block">
+                            <i class="fas fa-trash-alt fa-fw"></i>
+                            Inserat löschen
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
 {% include 'components/footer.html' %}
 {% endblock %}
 

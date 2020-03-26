@@ -6,7 +6,6 @@
 {{ block.super }}
 
 <link href="{% static 'css/login.css' %}" rel="stylesheet">
-<link href="{% static 'css/background.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
@@ -52,6 +51,11 @@
                 <label for="inputBrithday">Geburtsdatum</label>
               </div>
 
+              <div class="form-label-group">
+                <input name="phone" type="text" id="phone" class="form-control" placeholder="Telefonnummer">
+                <label for="phone">Telefonnummer</label>
+              </div>
+
               <hr>
 
               <div class="form-label-group">
@@ -74,8 +78,6 @@
       </div>
     </div>
   </div>
-
-{% include 'components/footer.html' %}
 
 
 {% endblock %}

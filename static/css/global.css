@@ -1,13 +1,23 @@
 .header {
-    display: block;
-    width: 100%;
-    padding: 4rem 0;
+  display: block;
+  width: 100%;
+  padding: 2rem 0;
 
-    background-repeat: no-repeat;
-    background-position: 50%;
+  background-repeat: no-repeat;
+  background-position: 50%;
 
+  color: #FFF;
+}
 
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    color: #FFF;
-  }
+.task, .task:hover, .task:focus {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+.task .card {
+  transition: box-shadow .12s;
+}
+
+.task:hover .card {
+  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+}

@@ -14,6 +14,7 @@ urlpatterns = [
     path('accounts/logout', LogoutView.as_view()),
     path('accounts/register-citizen', RegisterCitizenView.as_view()),
     path('accounts/register-company', RegisterCompanyView.as_view()),
+    path('accounts/reset-password', ResetPasswordView.as_view()),
 
     # Companies
     path('companies', CompanyListView.as_view()),
