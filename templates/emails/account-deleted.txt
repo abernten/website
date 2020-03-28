@@ -1,0 +1,10 @@
+Hallo {{ username }},
+
+schade dich gehen zu sehen!
+
+Wir haben deinen Account und alle dazugehörigen Daten gelöscht.
+
+Hoffe du beehrst uns bald wieder!
+
+Viele Grüße,
+Dein Abernten.de-Team

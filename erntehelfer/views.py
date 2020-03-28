@@ -8,6 +8,7 @@ from django.contrib.auth.models import Group
 from django.core.mail import send_mail
 from django.core.paginator import Paginator
 from django.views.generic import CreateView
+from django.template.loader import render_to_string
 
 from .models import CompanyProfile, LicenseClass, User
 from .forms import RegisterCompanyForm, SettingsUserForm, SettingsCompanyForm
@@ -52,22 +53,16 @@ class RegisterCompanyView(FormView):
         # Nachricht ausgeben
         messages.success(self.request, 'Konto wurde erfolgreich erstellt!', extra_tags='alert-success')
 
-        send_mail('Bestätigung Ihrer Registrierung für Abernten.de ',
-                      'Hallo Nutzer. \n \n' +
-                      'Vielen Dank, dass du Abernten.de nutzt! \n \n' +
-                      #</br>
-                      'Du kannst Abernten.de nun nutzen. Teile der Community mit, in welchen Bereichen du Hilfe brauchst & überprüfe regelmäßig, ob du Bewerber hast. \n \n'
-                      #</br>
-                      'Vielen Dank und Frohes Schaffen! \n \n'
-                      #</br>
-                      'Dein Abernten-Team \n',
-                      'info@abernten.de',
-                      [company.owner.email])
+        # Render template to string
+        tmpl = render_to_string('emails/register.txt', {
+            'username': user.username
+        })
+        send_mail('[Abernten.de] Bestätigung Ihrer Registrierung', tmpl, 'info@abernten.de', [company.owner.email])
 
-        return super().form_valid(form)
+        return super(RegisterCompanyView, self).form_valid(form)
 
 # Displays all registered companies
-class CompanyListView(LoginRequiredMixin,View):
+class CompanyListView(View):
 
     def get(self, request):
         categories = Category.objects.all()
@@ -103,7 +98,7 @@ class CompanyListView(LoginRequiredMixin,View):
         })
 
 # Displays the profile of a company
-class CompanyProfileView(LoginRequiredMixin,View):
+class CompanyProfileView(View):
 
     def get(self, request, id):
         company = CompanyProfile.objects.get(pk=id)
@@ -113,7 +108,7 @@ class CompanyProfileView(LoginRequiredMixin,View):
         })
 
 # Displays the company settings
-class SettingsView(LoginRequiredMixin,UpdateView):
+class SettingsView(LoginRequiredMixin, UpdateView):
     model = CompanyProfile
     form_class = SettingsCompanyForm
     template_name = 'settings/company.html'
@@ -149,32 +144,26 @@ class SettingsUserView(LoginRequiredMixin,UpdateView):
 
     def form_valid(self, form):
         messages.success(self.request, 'Die Einstellungen wurden erfolgreich gespeichert!', extra_tags='alert-success')
-        return super().form_valid(form)
+        return super(SettingsUserView, self).form_valid(form)
 
 # Deletes the user
 class DeleteUserView(LoginRequiredMixin,View):
 
     def get(self, request):
-        company = CompanyProfile.objects.get(owner__id=request.user.id)
-        user = request.user
-        logout(request)
+        company = get_object_or_404(CompanyProfile, owner=request.user)
 
-        send_mail('Ihr Account bei Abernten.de wurde gelöscht',
-                      'Hallo Nutzer. \n \n' +
-                      'Vielen Dank, dass du Abernten.de genutzt hast! \n \n' +
-                      #</br>
-                      'Wir haben wunschgemäß deinen Account und alle damit verbundenen Informationen gelöscht. \n \n'
-                      #</br>
-                      'Vielen Dank, \n \n'
-                      #</br>
-                      'Dein Abernten-Team \n',
-                      'info@abernten.de',
-                      [company.owner.email])
+        # Send mail
+        tmpl = render_to_string('emails/account-deleted.txt', {
+            'username': request.user.username
+        })
+        send_mail('[Abernten.de] Ihr Account wurde gelöscht!', tmpl, 'info@abernten.de', [company.owner.email])
 
+        # Firmenprofil und benutzer löschen
         company.delete()
-        user.delete()
+        request.user.delete()
 
-
+        # Benutzer ausloggen
+        logout(request)
 
         return redirect('/')
 

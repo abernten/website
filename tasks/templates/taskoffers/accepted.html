@@ -54,7 +54,7 @@
         <tr>
           <td>
             <strong class="text-success">{{ offer.full_name }}</strong><br>
-            {{ offer.phone }}<br>
+            <a href="tel:{{ offer.phone }}">{{ offer.phone }}</a><br>
             <a href="mailto:{{ offer.email }}">{{ offer.email }}</a>
           </td>
           <td>

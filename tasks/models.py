@@ -54,7 +54,7 @@ class Task(models.Model):
     def find_coordinates(self):
         response = requests.get('https://nominatim.openstreetmap.org/search', params={
             'format': 'json',
-            'country': 'germany',
+            'country': 'germany', # TODO: ÄNDERN BITTE PLS EUROPÄISIERUNG
             'postalcode': self.zip_code
         })
 

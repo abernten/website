@@ -9,6 +9,10 @@ pylint-django = "*"
 
 [packages]
 django-crispy-forms = "*"
+django = "*"
+mysqlclient = "*"
+requests = "*"
+geopy = "*"
 
 [requires]
 python_version = "3.8"

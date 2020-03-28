@@ -1,0 +1,8 @@
+Hallo {{ username }},
+
+vielen Dank, dass du Abernten.de nutzt!
+
+Du hast nun die Möglichkeit Inserate zu erstellen und nach Helfern für deinen Betrieb zu suchen.
+
+Viele Grüße,
+Dein Abernten.de-Team!

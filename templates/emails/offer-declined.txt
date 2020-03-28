@@ -1,0 +1,11 @@
+Hallo {{ full_name }}!
+
+Vielen Dank, dass du Abernten.de nutzt!
+
+Dein Hilfeangebot vom {{ created_at | date:'d.m.Y' }} für "{{ title }}" wurde leider abgelehnt.
+
+Dies kann viele verschiedene Gründe haben. Du kannst dich gerne auf ein anderes Hilfegesuch in deiner Nähe melden.
+
+Vielen Dank und Viele Grüße,
+
+Dein Abernten.de-Team

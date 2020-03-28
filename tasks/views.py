@@ -5,6 +5,7 @@ from django.core.paginator import Paginator
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.mail import send_mail
+from django.template.loader import render_to_string
 
 from datetime import datetime
 
@@ -85,11 +86,19 @@ class TaskView(TemplateView):
         return context
 
 # Creates a new task in the DB
-class CreateTaskView(LoginRequiredMixin, CreateView):
+class CreateTaskView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Task
     template_name = 'tasks/create.html'
     form_class = TaskForm
     login_url = '/accounts/login'
+
+    def test_func(self):
+        company = get_object_or_404(CompanyProfile, owner=self.request.user)
+        return company.street and company.zip_code and company.city
+
+    def handle_no_permission(self):
+        messages.error(self.request, 'Bitte vervollständige die Anschrift in deinem Firmenprofil bevor du Inserate anlegst!', extra_tags='alert-danger')
+        return redirect('/settings')
 
     def form_valid(self, form):
         self.object = form.save(commit=False)
@@ -100,7 +109,7 @@ class CreateTaskView(LoginRequiredMixin, CreateView):
             return self.form_invalid(form)
 
         # Company profile vor dem Speichern hinzufügen
-        self.object.company = CompanyProfile.objects.get(owner__id=self.request.user.id)
+        self.object.company = get_object_or_404(CompanyProfile, owner=self.request.user)
 
         # Koordinaten berechnen und speichern
         if not self.object.find_coordinates():
@@ -131,15 +140,14 @@ class EditTaskView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return super(EditTaskView, self).form_valid(form)
 
 # sets the task to done
-class FinishTaskView(LoginRequiredMixin, View):
+class FinishTaskView(LoginRequiredMixin, UserPassesTestMixin, View):
     login_url = '/accounts/login'
+
+    def test_func(self):
+        return self.request.user == get_object_or_404(Task, pk=id).owner
 
     def get(self, request, id):
         task = get_object_or_404(Task, pk=id)
-
-        # Nicht der Besitzer des Inserats
-        if not request.user.is_authenticated or not task.company.owner.id == request.user.id:
-            return redirect('/tasks')
 
         if not task.done:
             task.done = True
@@ -164,10 +172,10 @@ class ApplyTaskView(CreateView):
         return super(ApplyTaskView, self).form_valid(form)
 
 # Displays a list of my currently active tasks
-class MyTaskListView(LoginRequiredMixin,View):
+class MyTaskListView(LoginRequiredMixin, View):
 
     def get(self, request):
-        company = CompanyProfile.objects.get(owner__id=request.user.id)
+        company = get_object_or_404(CompanyProfile, owner=request.user)
 
         # Query
         q = company.get_open_tasks().order_by('start_date')
@@ -183,7 +191,8 @@ class MyTaskListView(LoginRequiredMixin,View):
             'page_obj': page_obj
         })
 
-class OpenOffersListView(LoginRequiredMixin,ListView):
+# Displays all unanswered offers
+class OpenOffersListView(LoginRequiredMixin, ListView):
     model = TaskOffer
     paginate_by = 5
     template_name = 'taskoffers/open.html'
@@ -192,7 +201,8 @@ class OpenOffersListView(LoginRequiredMixin,ListView):
         company = get_object_or_404(CompanyProfile, owner=self.request.user)
         return TaskOffer.objects.filter(task__company=company, state=TaskOffer.OPEN, task__done=False, task__end_date__gt=datetime.now()).order_by('-updated_at')
 
-class AcceptedOffersListView(LoginRequiredMixin,ListView):
+# Displays all already accepted offers
+class AcceptedOffersListView(LoginRequiredMixin, ListView):
     model = TaskOffer
     paginate_by = 20
     template_name = 'taskoffers/accepted.html'
@@ -201,7 +211,8 @@ class AcceptedOffersListView(LoginRequiredMixin,ListView):
         company = get_object_or_404(CompanyProfile, owner=self.request.user)
         return TaskOffer.objects.filter(task__company=company, state=TaskOffer.ACCEPTED, task__done=False, task__end_date__gt=datetime.now()).order_by('-updated_at')
 
-class DeclinedOffersListView(LoginRequiredMixin,ListView):
+# Displays all declined offers
+class DeclinedOffersListView(LoginRequiredMixin, ListView):
     model = TaskOffer
     paginate_by = 20
     template_name = 'taskoffers/declined.html'
@@ -210,7 +221,11 @@ class DeclinedOffersListView(LoginRequiredMixin,ListView):
         company = get_object_or_404(CompanyProfile, owner=self.request.user)
         return TaskOffer.objects.filter(task__company=company, state=TaskOffer.DECLINED, task__done=False, task__end_date__gt=datetime.now()).order_by('-updated_at')
 
-class AcceptTaskOfferView(LoginRequiredMixin,View):
+# accepts a taskoffer
+class AcceptTaskOfferView(LoginRequiredMixin, UserPassesTestMixin, View):
+
+    def test_func(self):
+        return self.request.user == get_object_or_404(TaskOffer, pk=self.kwargs['id']).task.company.owner
 
     def get(self, request, id):
         # Save task offer
@@ -220,70 +235,57 @@ class AcceptTaskOfferView(LoginRequiredMixin,View):
 
         company = offer.task.company
 
-        send_mail('Bestätigung deines Hilfeangebots für ' + offer.task.title,
-                    'Hallo ' + offer.full_name + '. \n \n' +
-                    'Vielen Dank, dass du Abernten.de nutzt! \n \n' +
-                    #</br>
-                    'Dein Hilfeangebot vom ' + '{0:%d.%m.%Y}'.format(offer.created_at) + ' wurde akzeptiert. \n \n' +
-                    'Hier findest du die Kontaktdaten des Helfers: \n' +
-                    'Betriebsname:' + offer.task.company.company_name + ' \n' + offer.task.company.street + '\n'+ offer.task.company.zip_code + ' ' + offer.task.company.city + '\n' + 'Tel: ' + offer.task.company.owner.phone + '\n' + 'Mail: ' + offer.task.company.owner.email + '\n \n' +
-                    #</br>
-                    'Bitte setze dich mit der Person in Verbindung, um genaueres wie Einsatzzeitraum und Bezahlung zu klären. \n' +
-                    #</br>
-                    'Vielen Dank und Frohes Schaffen! \n \n'
-                    #</br>
-                    'Dein Abernten-Team \n',
-                    'info@abernten.de',
-                    [offer.email]
-                )
+        # Mail an Helfer
+        tmpl = render_to_string('emails/offer-accepted.txt', {
+            'full_name': offer.full_name,
+            'title': offer.task.title,
+            'created_at': offer.created_at,
+            'company_name': company.company_name,
+            'street': company.street,
+            'zip_code': company.zip_code,
+            'city': company.city,
+            'phone': company.owner.phone,
+            'email':company.owner.email
+        })
+        send_mail('[Abernten.de] Deine Bewerbung bei {} wurde akzeptiert!'.format(company.company_name), tmpl, 'info@abernten.de', [offer.email])
 
-        send_mail('Bestätigung eines Hilfeangebots für: ' + offer.task.title ,
-                    'Hallo ' + company.company_name + '. \n \n' +
-                    'Vielen Dank, dass du Abernten.de nutzt! \n \n' +
-                    #</br>
-                    'Du hast das Hilfeangebot von ' + offer.full_name + ' akzeptiert. \n \n' +
-                    'Hier findest du die Kontaktdaten des Helfers: \n' +
-                    offer.full_name + ' \n' + 'Tel: ' + offer.phone + '\n' + 'Mail: ' + offer.email + '\n \n' +
-                    #</br>
-                    'Bitte setze dich mit der Person in Verbindung, um genaueres wie Einsatzzeitraum und Bezahlung zu klären. \n' +
-                    #</br>
-                    'Vielen Dank und Viele Grüße \n \n'
-                    #</br>
-                    'Dein Abernten-Team \n',
-                    'info@abernten.de',
-                    [company.owner.email]
-                )
+        # Mail an Betrieb
+        tmpl = render_to_string('emails/offer-accepted-company.txt', {
+            'username': request.user.username,
+            'title': offer.task.title,
+            'full_name': offer.full_name,
+            'phone': offer.phone,
+            'email': offer.email
+        })
+        send_mail('[Abernten.de] Du hast die Bewerbung von einem Helfer akzeptiert', tmpl, 'info@abernten.de', [company.owner.email])
 
         messages.success(request, 'Die Kontaktdaten werden an den Interessenten versendet!',extra_tags='alert-success')
         return redirect('/tasks/offers/accepted')
 
 # Declines a canditature and deletes the database entry
-class DeclineTaskOfferView(LoginRequiredMixin,View):
+class DeclineTaskOfferView(LoginRequiredMixin, UserPassesTestMixin, View):
+
+    def test_func(self):
+        return self.request.user == get_object_or_404(TaskOffer, pk=self.kwargs['id']).task.company.owner
 
     def get(self, request, id):
-        if request.user.groups.filter(name__in=['Betrieb']).exists():
-            # Company
-            offer = TaskOffer.objects.get(pk=id)
-            offer.state = 2
-            offer.save()
+        # Company
+        offer = get_object_or_404(TaskOffer, pk=id)
+        offer.state = TaskOffer.DECLINED
+        offer.save()
 
-            send_mail('Ablehnung ihres Hilfeangebotes für: ' + offer.task.title,
-                      'Hallo ' + offer.full_name + '. \n \n' +
-                      'Vielen Dank, dass du Abernten.de nutzt! \n \n' +
-                      #</br>
-                      'Dein Hilfeangebot vom ' + '{0:%d.%m.%Y}'.format(offer.created_at) + ' wurde leider abgelehnt. \n \n' +
-                      'Dies kann viele verschiedene Gründe haben. Du kannst dich gerne auf ein anderes Hilfegesuch in deiner Nähe melden. \n \n'
-                      #</br>
-                      'Vielen Dank und Viele Grüße \n\n'
-                      #</br>
-                      'Dein Abernten-Team \n',
-                      'info@abernten.de',
-                      [offer.email]
-                    )
+        company = offer.task.company
 
-            offer.delete()
+        # Mail an Helfer
+        tmpl = render_to_string('emails/offer-declined.txt', {
+            'full_name': offer.full_name,
+            'created_at': offer.created_at,
+            'title': offer.task.title
+        })
 
-            messages.success(request, 'Der Helfer wurde über die Ablehnung informiert!',extra_tags='alert-success')
-            return redirect('/tasks/offer/declined')
-        else:
-            return redirect('/')
+        send_mail('[Abernten.de] Deine Bewerbung bei {} wurde abgelehnt!'.format(company.company_name), tmpl, 'info@abernten.de', [offer.email])
+
+        # offer.delete()
+
+        messages.success(request, 'Der Helfer wurde über die Ablehnung informiert!',extra_tags='alert-success')
+        return redirect('/tasks/offers/declined')

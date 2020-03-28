@@ -1,0 +1,16 @@
+Hallo {{ username }}.
+
+Vielen Dank, dass du Abernten.de nutzt!
+
+Du hast das Hilfeangebot von {{ full_name }} für "{{title}}" akzeptiert.
+
+Hier findest du die Kontaktdaten des Helfers:
+{{ full_name }}
+Tel: {{ phone }}
+Mail: {{ email }}
+
+Bitte setze dich mit der Person in Verbindung, um genaueres wie Einsatzzeitraum und Bezahlung zu klären.
+
+Vielen Dank und Viele Grüße,
+
+Dein Abernten.de-Team

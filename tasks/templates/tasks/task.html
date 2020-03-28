@@ -100,6 +100,7 @@
           </div>
         </div>
 
+        {% if is_owner or request.user.is_anonymous %}
         <div class="card">
           <div class="card-body">
             {% comment %} Mitmachen Button {% endcomment %}
@@ -123,6 +124,7 @@
             {% endif %}
           </div>
         </div>
+        {% endif %}
       </div>
 
     </div>
