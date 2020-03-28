@@ -1,4 +1,5 @@
 {% extends 'layout.html' %}
+{% load crispy_forms_tags %}
 
 {% load static %}
 
@@ -27,51 +28,9 @@
                 {% endfor %}
             {% endif %}
 
-            {% if form.errors %}
-              {% for error in form.errors %}
-                <h1>{{ error }}</h1>
-              {% endfor %}
-            {% endif %}
-
             <form method="post" action="" class="form-signin">
-              <div class="form-label-group">
-                <input name="username" type="text" id="inputUserame" class="form-control" placeholder="Benutzername" required autofocus>
-                <label for="inputUserame">Benutzername</label>
-              </div>
 
-              <div class="form-label-group">
-                <input name="email" type="email" id="inputEmail" class="form-control" placeholder="E-Mail Adresse" required>
-                <label for="inputEmail">E-Mail Adresse</label>
-              </div>
-
-              <hr>
-
-              <div class="form-label-group">
-                <input name="company_name" type="text" id="inputCompanyName" class="form-control" placeholder="Firmenname" required>
-                <label for="inputCompanyName">Betriebsname</label>
-              </div>
-
-              <div class="form-label-group">
-                <input name="company_number" type="text" id="inputCompanyNumber" class="form-control" placeholder="Betriebsnummer (optional)">
-                <label for="inputCompanyNumber">Betriebsnummer (optional)</label>
-              </div>
-
-              <div class="form-label-group">
-                <input name="phone" type="text" id="phone" class="form-control" placeholder="Telefonnummer">
-                <label for="phone">Telefonnummer</label>
-              </div>
-
-              <hr>
-
-              <div class="form-label-group">
-                <input name="password" type="password" id="inputPassword" class="form-control" placeholder="Passwort" required>
-                <label for="inputPassword">Passwort</label>
-              </div>
-
-              <div class="form-label-group">
-                <input name="password_2" type="password" id="inputPassword_2" class="form-control" placeholder="Passwort bestätigen" required>
-                <label for="inputPassword_2">Passwort bestätigen</label>
-              </div>
+              {{ form | crispy }}
 
               {% csrf_token %}
 

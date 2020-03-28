@@ -1,114 +1,155 @@
 {% extends 'layout.html' %}
-{% load static %}
 
 {% block title %}{{ task.title }}{% endblock %}
 
 {% block content %}
 {% include 'components/navbar.html' %}
 
-<div class="container-fluid py-4 bg-light">
-    <div class="container">
-        <a href="/tasks" class="d-block mb-4">&larr; Zurück zur Liste</a>
+<div class="container-fluid py-4">
+  <div class="container">
+    <a href="/tasks" class="d-block mb-4">&larr; Zurück zur Liste</a>
 
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert {% if message.tags %}{{ message.tags }}{% endif %} my-2">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
+    {% if task.done %}
+      <div class="alert alert-danger" role="alert">
+        Das Inserat wurde gelöscht.
+      </div>
+    {% else %}
 
-        <div class="row">
-            <div class="col-12 col-lg mb-4 mb-lg-0">
-                <div class="card">
-
-                    <div class="card-body">
-                        <h5 class="card-title"><strong>{{ task.title }}</strong></h5>
-
-                        <p class="text-secondary my-3">
-                            {{ task.description }}
-                        </p>
-
-                        <small class="text-muted">
-                            Zeitraum vom {{ task.start_date }} bis {{ task.end_date }}
-                        </small>
-                    </div>
-
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">
-                            Benötigte Helfer
-                            <p class="float-right m-0">
-                                {{ task.helpers_count }}
-                            </p>
-                        </li>
-                        <li class="list-group-item">
-                            Postleitzahl
-                            <p class="float-right m-0">
-                                {{ task.zip_code }}
-                            </p>
-                        </li>
-                        <li class="list-group-item">
-                            Kategorie
-                            <p class="float-right m-0">
-                                {{ task.category.name }}
-                            </p>
-                        </li>
-                        <li class="list-group-item">
-                            Führerscheinklassen
-                            <p class="float-right m-0">
-                            {% if not task.drivers_licenses.all.exists %}
-                                -/-
-                            {% endif %}
-                            {% for license in task.drivers_licenses.all %}
-                                <span class="badge badge-pill badge-success">{{ license.class_name }}</span>
-                            {% endfor %}
-                            </p>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="col-12 col-lg col-lg-4">
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <h5 class="card-title m-0">{{ task.company.company_name }}</h5>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-body">
-                        {% if is_participating %}
-                            <div class="alert alert-info">
-                                <strong>Du hast dein Interesse am Angebot verkündet!</strong><br><br>
-                                Gib dem Betrieb ein wenig Zeit zu entscheiden. :)
-                            </div>
-                        {% endif %}
-                        <a {% if request.user.is_authenticated and request.user.is_helfer %}href="/tasks/{{ task.id }}/participate"{% else %}href="/accounts/register-citizen"{% endif %} class="btn btn-success btn-block btn-lg {% if is_participating %}disabled{% endif %}">
-                            <i class="fas fa-hands-helping fa-fw"></i>
-                            Mitmachen
-                        </a>
-
-                        {% if is_owner %}
-                        <button class="btn btn-light btn-block">
-                            <i class="fas fa-trash-alt fa-fw"></i>
-                            Inserat löschen
-                        </button>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
+    {% comment %} Messages {% endcomment %}
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert {% if message.tags %}{{ message.tags }}{% endif %} my-2">
+          {{ message }}
         </div>
+      {% endfor %}
+    {% endif %}
+
+    <div class="row">
+
+      {% comment %} Linke Spalte {% endcomment %}
+      <div class="col-12 col-lg mb-4 mb-lg-0">
+        <div class="card">
+
+          <div class="card-body">
+
+            {% comment %} Kurzbeschreibung {% endcomment %}
+            <h5 class="card-title"><strong>{{ task.title }}</strong></h5>
+
+            {% comment %} Beschreibung {% endcomment %}
+            <div class="text-secondary my-3">
+              {{ task.description | linebreaks }}
+            </div>
+
+            {% comment %} Anfangszeit und Enddatum {% endcomment %}
+            <small class="text-muted">
+              Zeitraum vom {{ task.start_date }} bis {{ task.end_date }}
+            </small>
+
+          </div>
+
+          <ul class="list-group list-group-flush">
+
+            {% comment %} Anzahl benötigter Helfer {% endcomment %}
+            <li class="list-group-item">
+              Benötigte Helfer
+              <p class="float-right m-0">
+                {{ task.helpers_count }}
+              </p>
+            </li>
+
+            {% comment %} Postleitzahl {% endcomment %}
+            <li class="list-group-item">
+              Postleitzahl
+              <p class="float-right m-0">
+                {{ task.zip_code }}
+              </p>
+            </li>
+
+            {% comment %} Kategorie {% endcomment %}
+            <li class="list-group-item">
+              Kategorie
+              <p class="float-right m-0">
+                {{ task.category.name }}
+              </p>
+            </li>
+
+            {% comment %} Führerscheinklassen {% endcomment %}
+            <li class="list-group-item">
+              Führerscheinklassen
+              <p class="float-right m-0">
+                {% if not task.drivers_licenses.all.exists %}
+                  -/-
+                {% endif %}
+                {% for license in task.drivers_licenses.all %}
+                  <span class="badge badge-pill badge-success">{{ license.class_name }}</span>
+                {% endfor %}
+              </p>
+            </li>
+
+          </ul>
+        </div>
+      </div>
+
+      {% comment %} Rechte Spalte {% endcomment %}
+      <div class="col-12 col-lg col-lg-4">
+
+        {% comment %} Informationen zum Betrieb {% endcomment %}
+        <div class="card mb-4">
+          <div class="card-body">
+            <h5 class="card-title m-0">{{ task.company.company_name }}</h5>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            {% comment %} Mitmachen Button {% endcomment %}
+            {% if request.user.is_anonymous %}
+              <a href="/tasks/{{ task.id }}/apply" class="btn btn-success btn-block btn-lg">
+                <i class="fas fa-hands-helping fa-fw mr-2"></i>
+                Mitmachen
+              </a>
+            {% endif %}
+
+            {% comment %} Verwaltungsbuttons {% endcomment %}
+            {% if is_owner %}
+              <a href="/tasks/{{ task.id }}/edit" class="btn btn-light btn-block">
+                <i class="fas fa-edit fa-fw mr-2"></i>
+                Bearbeiten
+              </a>
+              <button class="btn btn-danger btn-block" data-toggle="modal" data-target="#deleteModal">
+                <i class="fas fa-trash-alt fa-fw mr-2"></i>
+                Inserat löschen
+              </button>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
     </div>
+
+    {% endif %}
+  </div>
 </div>
 
-{% include 'components/footer.html' %}
-{% endblock %}
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Inserat löschen</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Sind Sie sicher, dass Sie das Inserat endgültig löschen möchten?<br><br>
 
-{% block scripts %}
-{{ block.super }}
-
-<script>
-    $(function () {
-        $('.selectpicker').selectpicker();
-    });
-</script>
+        <strong>Diese Aktion kann nicht rückgängig gemacht werden!</strong>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Abbrechen</button>
+        <a href="/tasks/{{ task.id }}/finish" class="btn btn-danger">Ja, löschen</a>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

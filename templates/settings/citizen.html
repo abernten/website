@@ -76,16 +76,19 @@
 
                     {% csrf_token %}
 
-                    <div class="text-center my-3">
-                        <button type="submit" class="btn btn-lg btn-primary rounded-pill" style="background-color: #a88b48; border: none;">Speichern
-                        </button>
+                    <div class="d-flex justify-content-center">
+                        <div class="text-center mt-3">
+                          <button class="btn btn-success text-center mx-1" type="submit">
+                            <i class="far fa-save fa-fw mr-2"></i>
+                            Speichern
+                          </button>
+                        </div>
                     </div>
                 </form>
             </div>
         </div>
   </div>
 </div>
-{% include 'components/footer.html' %}
 {% endblock %}
 
 {% block scripts %}

@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     'crispy_forms',
     'erntehelfer',
     'tasks',
-    'interests',
 ]
 
 MIDDLEWARE = [
@@ -68,6 +67,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'tasks.context_processors.task_offer_count'
             ],
         },
     },
@@ -130,6 +130,8 @@ STATICFILES_DIRS = [
 
 # Custom user model
 AUTH_USER_MODEL = 'erntehelfer.User'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 
@@ -139,3 +141,12 @@ CRISPY_CLASS_CONVERTERS = {
     # Wegen selectpicker
     'selectmultiple': 'selectmultiple selectpicker form-control'
 }
+
+# EMAIL BACKEND
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = os.getenv('EMAIL_HOST')
+EMAIL_PORT = os.getenv('EMAIL_PORT', 587)
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'info@abernten.de')

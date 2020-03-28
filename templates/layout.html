@@ -15,9 +15,12 @@
     <link href="{% static 'css/all.css' %}" rel="stylesheet">
     <link href="{% static 'css/bootstrap.css' %}" rel="stylesheet">
     <link href="{% static 'css/bootstrap-select.min.css' %}" rel="stylesheet">
-    <link href="{% static 'css/bootstrap-datepicker.min.css' %}" rel="stylesheet">
     <link href="{% static 'css/global.css' %}" rel="stylesheet">
     <style>
+    *, *:after, *:before {
+        box-sizing: border-box;
+    }
+
     html, body {
         font-family: 'Open Sans', sans-serif;
     }
@@ -28,7 +31,11 @@
 </head>
 
 <body>
-    {% block content %}{% endblock %}
+    <div class="main-content">
+        {% block content %}{% endblock %}
+    </div>
+
+    {% include 'components/footer.html' %}
 
     <!-- Scripts -->
     {% block scripts %}
@@ -37,8 +44,6 @@
 
     <script src="{% static 'js/bootstrap-select/bootstrap-select.min.js' %}"></script>
     <script src="{% static 'js/bootstrap-select/defaults-de_DE.min.js' %}"></script>
-
-    <script src="{% static 'js/bootstrap-datepicker.min.js' %}"></script>
     {% endblock %}
 </body>
 

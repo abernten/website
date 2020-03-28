@@ -33,5 +33,12 @@
         "fields": {
             "name": "Erntefahrer"
         }
+    },
+    {
+        "model": "tasks.Category",
+        "pk": 6,
+        "fields": {
+            "name": "Tierpflege"
+        }
     }
 ]

@@ -21,3 +21,23 @@
 .task:hover .card {
   box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
 }
+
+.main-content {
+  min-height: 90vh;
+  position: relative;
+  margin: 0;
+}
+
+.main-footer {
+  height: 10vh;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 1rem;
+  background-color: rgb(32, 46, 46);
+  text-align: center;
+}
+
+.asteriskField {
+  color: red;
+}

@@ -1,16 +1,26 @@
 {% extends 'layout.html' %}
 {% load crispy_forms_tags %}
 
-{% block title %}Inserat bearbeiten{% endblock %}
+{% block title %}Firmenprofil aktualisieren{% endblock %}
 
 {% block content %}
 {% include 'components/navbar.html' %}
-<div class="bg-light">
+
+<div class="container-fluid">
   <div class="container py-4">
+    {% comment %} Messages {% endcomment %}
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert {% if message.tags %}{{ message.tags }}{% endif %} my-2">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
     <div class="card">
       <div class="card-header">
-        <i class="fas fa-edit fa-fw mr-2"></i>
-        Inserat bearbeiten
+        <i class="fas fa-building fa-fw mr-2"></i>
+        Firmenprofil aktualisieren
       </div>
 
       <div class="card-body">
@@ -22,8 +32,8 @@
           <div class="d-flex justify-content-center">
             <div class="text-center mt-3">
               <button class="btn btn-success text-center mx-1" type="submit">
-                <i class="fas fa-upload fa-fw mr-2"></i>
-                Inserat veöffentlichen
+                <i class="far fa-save fa-fw mr-2"></i>
+                Speichern
               </button>
             </div>
           </div>
@@ -32,14 +42,4 @@
     </div>
   </div>
 </div>
-
-{% endblock %}
-
-{% block scripts %}
-{{ block.super }}
-<script>
-$(function () {
-  $('.selectpicker').selectpicker();
-});
-</script>
 {% endblock %}

@@ -1,0 +1,136 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block title %}Offene Bewerbungen{% endblock %}
+
+{% block content %}
+{% include 'components/navbar.html' %}
+
+<div class="header text-center" style="background-image: url('{% static 'img/richard-bell-vpfEhvI5UE4-unsplash.jpg' %}')">
+  <div class="container">
+    <h2 style="font-weight: 300 !important;" class="d-block">Bewerberliste</h2>
+  </div>
+</div>
+
+<div class="container my-4">
+  <ul class="nav nav-tabs my-4">
+    <li class="nav-item">
+      <a class="nav-link active" href="/tasks/offers">
+        Unbeantwortet
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="/tasks/offers/accepted">
+        Akzeptiert
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="/tasks/offers/declined">
+        Abgelehnt
+      </a>
+    </li>
+  </ul>
+
+  {% if messages %}
+      {% for message in messages %}
+        <div class="alert {% if message.tags %}{{ message.tags }}{% endif %} my-2">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
+
+  {% for offer in object_list %}
+    <div class="card my-4 d-block">
+      <div class="row">
+        <div class="col mx-3 py-3">
+          <h5><strong>{{ offer.full_name}}</strong></h5>
+          <h6>{{ offer.task.title }}</h6>
+
+          <p class="text-muted mt-3">
+            {{ offer.message }}
+          </p>
+        </div>
+
+        <div class="col mx-3 py-3 bg-light">
+          <div class="row">
+            <div class="col-12 col-lg">
+              <p>
+                <small class="text-muted">Eingereicht am:</small><br>
+                {{ offer.created_at | date:"d.m.Y" }} um {{ offer.created_at | time:"H:i" }} Uhr<br><br>
+                <small class="text-muted">Führerscheinklassen:</small><br>
+                {% if not offer.drivers_licenses.all.exists %}
+                  -/-
+                {% endif %}
+                {% for license in offer.drivers_licenses.all %}
+                  <span class="badge badge-pill badge-success">{{ license.class_name }}</span>
+                {% endfor %}<br><br>
+                <small class="text-muted">Alter:</small><br>
+                {{ offer.age }}
+              </p>
+            </div>
+            <div class="col-12 col-lg">
+              <p>
+                <small class="text-muted">Status:</small><br>
+                {% if offer.state == 0 %}
+                Offen
+                {% elif offer.state == 1 %}
+                <span class="text-success">Akzeptiert</span>
+                {% else %}
+                <span class="text-danger">Abgelehnt</span>
+                {% endif %}
+                <br><br>
+
+                <small class="text-muted">Aktion:</small><br>
+                {% if offer.state == 0 %}
+                    <a class="btn-sm btn-success mr-2 rounded" href="/tasks/offers/{{ offer.id }}/accept">
+                      <i class="fas fa-fw fa-check"></i>
+                    </a>
+                    <a class="btn-sm btn-danger rounded" href="/tasks/offers/{{ offer.id }}/decline">
+                      <i class="fas fa-fw fa-times"></i>
+                    </a>
+                {% elif offer.state == 1 %}
+                Daten verschickt!
+                {% endif %}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+
+  {% if object_list.count == 0 %}
+  <p>
+    Keine Bewerber gefunden
+  </p>
+  {% endif %}
+
+  <div class="row justify-content-between align-items-center mt-5">
+    <div class="col text-left">
+      {% if page_obj.has_previous %}
+        <a class="btn btn-primary" href="/tasks?page={{ page_obj.previous_page_number }}">&larr; Vorherige Seite</a>
+      {% endif %}
+    </div>
+    <div class="col text-center">
+      <p class="m-0">
+        Seite {{ page_obj.number }} von {{ page_obj.paginator.num_pages }}
+      </p>
+    </div>
+    <div class="col text-right">
+      {% if page_obj.has_next %}
+        <a class="btn btn-primary" href="/tasks?page={{ page_obj.next_page_number }}">Nächste Seite &rarr;</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+$(function () {
+  $('.selectpicker').selectpicker();
+});
+</script>
+{% endblock %}

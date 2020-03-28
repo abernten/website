@@ -1,0 +1,104 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block title %}Offene Bewerbungen{% endblock %}
+
+{% block content %}
+{% include 'components/navbar.html' %}
+
+<div class="header text-center" style="background-image: url('{% static 'img/richard-bell-vpfEhvI5UE4-unsplash.jpg' %}')">
+  <div class="container">
+    <h2 style="font-weight: 300 !important;" class="d-block">Bewerberliste</h2>
+  </div>
+</div>
+
+<div class="container my-4">
+  <ul class="nav nav-tabs my-4">
+    <li class="nav-item">
+      <a class="nav-link" href="/tasks/offers">
+        Unbeantwortet
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link active" href="/tasks/offers/accepted">
+        Akzeptiert
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="/tasks/offers/declined">
+        Abgelehnt
+      </a>
+    </li>
+  </ul>
+
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert {% if message.tags %}{{ message.tags }}{% endif %} my-2">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+
+  <table class="table table-bordered">
+    <thead class="bg-light">
+      <tr>
+        <th>Kontaktdaten</th>
+        <th>Inserat</th>
+        <th>Akzeptiert am</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for offer in object_list %}
+        <tr>
+          <td>
+            <strong class="text-success">{{ offer.full_name }}</strong><br>
+            {{ offer.phone }}<br>
+            <a href="mailto:{{ offer.email }}">{{ offer.email }}</a>
+          </td>
+          <td>
+            {{ offer.task.title | truncatechars:40 }}
+          </td>
+          <td>
+            {{ offer.updated_at }}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% if object_list.count == 0 %}
+  <p>
+    Keine Bewerber gefunden
+  </p>
+  {% endif %}
+
+  <div class="row justify-content-between align-items-center mt-5">
+    <div class="col text-left">
+      {% if page_obj.has_previous %}
+        <a class="btn btn-primary" href="/tasks?page={{ page_obj.previous_page_number }}">&larr; Vorherige Seite</a>
+      {% endif %}
+    </div>
+    <div class="col text-center">
+      <p class="m-0">
+        Seite {{ page_obj.number }} von {{ page_obj.paginator.num_pages }}
+      </p>
+    </div>
+    <div class="col text-right">
+      {% if page_obj.has_next %}
+        <a class="btn btn-primary" href="/tasks?page={{ page_obj.next_page_number }}">Nächste Seite &rarr;</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script>
+$(function () {
+  $('.selectpicker').selectpicker();
+});
+</script>
+{% endblock %}

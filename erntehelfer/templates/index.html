@@ -42,10 +42,10 @@
         </a>
       </div>
       <div class="col text-center text-light">
-        <small>oder</small>
+        <p>oder</p>
       </div>
       <div class="col">
-        <a href="/tasks/create" class="homepage-button">
+        <a {% if request.user.is_authenticated %}href="/tasks/create"{% else %}href="/accounts/register"{% endif %} class="homepage-button">
           <Button class="btn btn-lg btn-block btn-light" style="height: 5rem;">
             <i class="fas fa-fw fa-search mr-2"></i>
             Nach Helfern suchen
@@ -116,5 +116,4 @@
   </a>
 </div>
 
-{% include 'components/footer.html' %}
 {% endblock %}

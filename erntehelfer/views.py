@@ -1,144 +1,73 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
+from django.views.generic import TemplateView, UpdateView, FormView
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.contrib.auth.models import Group
-
-from tasks.nominatim import find_coordinates
+from django.core.mail import send_mail
 from django.core.paginator import Paginator
+from django.views.generic import CreateView
 
-from .models import CompanyProfile, CitizenProfile, LicenseClass, User
-from .forms import RegisterCitizenForm, RegisterCompanyForm, SettingsUserForm, SettingsCitizenForm, SettingsCompanyForm
-from interests.models import InterestOffer
+from .models import CompanyProfile, LicenseClass, User
+from .forms import RegisterCompanyForm, SettingsUserForm, SettingsCompanyForm
 from tasks.models import Task, Category
+from tasks.nominatim import find_coordinates
 
-class IndexView(View):
+# Registration for
+class RegisterCompanyView(FormView):
+    form_class = RegisterCompanyForm
+    template_name = 'registration/register-company.html'
+    success_url = '/settings'
 
-    def get(self, request):
-        return render(request, 'index.html')
+    def form_valid(self, form):
+        # Passwörter prüfen
+        if form.cleaned_data['password'] != form.cleaned_data['password_2']:
+            messages.error(self.request, 'Die Passwörter simmen nicht überein!', extra_tags='alert-danger')
+            return super().form_invalid(form)
 
-class LoginView(View):
-    """
-    Loggt den Benutzer nach erfolgreicher Eingabe des Benutzernamens
-    und des Passworts ein.
-    """
+        # Prüfen, ob es einen Benutzer mit dem Namen bereits gibt
+        if User.objects.filter(username=form.cleaned_data['username']).exists():
+            messages.error(self.request, 'Es existiert bereits ein Benutzer mit diesem Benutzernamen!', extra_tags='alert-danger')
+            return super().form_invalid(form)
 
-    def get(self, request):
-        if request.user.is_authenticated:
-            return redirect('/')
-        return render(request, 'registration/login.html')
+        # Benutzer anlegen
+        user = User()
+        user.username = form.cleaned_data['username']
+        user.password = form.cleaned_data['password']
+        user.email = form.cleaned_data['email']
+        user.phone = form.cleaned_data['phone']
+        user.save()
 
-    def post(self, request):
-        username = request.POST['username']
-        password = request.POST['password']
+        # Betriebsprofil anlegen
+        company = CompanyProfile()
+        company.owner = user
+        company.company_name = form.cleaned_data['company_name']
+        company.company_number = form.cleaned_data['company_number']
+        company.save()
 
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            if user.is_active:
-                login(request, user)
-                return redirect('/')
-            else:
-                messages.error(request, 'Benutzer wurde deaktiviert')
-                return render(request, 'registration/login.html')
-        else:
-            messages.error(request, 'Falscher Benutzername oder falsches Passwort!')
-            return render(request, 'registration/login.html')
+        # Session einloggen
+        login(self.request, user)
 
-class LogoutView(View):
-    """
-    Loggt einen eingeloggten Benutzer aus.
-    """
+        # Nachricht ausgeben
+        messages.success(self.request, 'Konto wurde erfolgreich erstellt!', extra_tags='alert-success')
 
-    def get(self, request):
-        if request.user.is_authenticated:
-            logout(request)
-        return redirect('/')
+        send_mail('Bestätigung Ihrer Registrierung für Abernten.de ',
+                      'Hallo Nutzer. \n \n' +
+                      'Vielen Dank, dass du Abernten.de nutzt! \n \n' +
+                      #</br>
+                      'Du kannst Abernten.de nun nutzen. Teile der Community mit, in welchen Bereichen du Hilfe brauchst & überprüfe regelmäßig, ob du Bewerber hast. \n \n'
+                      #</br>
+                      'Vielen Dank und Frohes Schaffen! \n \n'
+                      #</br>
+                      'Dein Abernten-Team \n',
+                      'info@abernten.de',
+                      [company.owner.email])
 
-class RegisterCitizenView(View):
+        return super().form_valid(form)
 
-    def get(self, request):
-        if request.user.is_authenticated:
-            return redirect('/')
-        return render(request, 'registration/register-citizen.html')
-
-    def post(self, request):
-        form = RegisterCitizenForm(request.POST)
-
-        if form.is_valid():
-            if form.cleaned_data['password'] != form.cleaned_data['password_2']:
-                messages.error(request, 'Passwörter stimmen nicht überein!', extra_tags='alert-danger')
-                return render(request, 'registration/register-citizen.html')
-
-            group = Group.objects.get(name='Helfer')
-
-            user = User()
-            user.username = form.cleaned_data['username']
-            user.email    = form.cleaned_data['email']
-            user.password = form.cleaned_data['password']
-            user.phone = form.cleaned_data['phone']
-            user.save()
-
-            user.groups.add(group)
-
-            citizen = CitizenProfile()
-            citizen.owner = user
-            citizen.date_of_birth = form.cleaned_data['date_of_birth']
-            citizen.save()
-
-            login(request, user)
-
-            messages.success(request, 'Benutzerkonto wurde erfolgreich erstellt!', extra_tags='alert-success')
-            return redirect('/')
-        else:
-            messages.error(request, 'Ein Fehler ist aufgetreten. Bitte überprüfe deine Eingaben!', extra_tags='alert-danger')
-            return render(request, 'registration/register-citizen.html', {
-                'form': form
-            })
-
-class RegisterCompanyView(View):
-
-    def get(self, request):
-        if request.user.is_authenticated:
-            return redirect('/')
-        return render(request, 'registration/register-company.html')
-
-    def post(self, request):
-        form = RegisterCompanyForm(request.POST)
-
-        if form.is_valid():
-            if form.cleaned_data['password'] != form.cleaned_data['password_2']:
-                messages.error(request, 'Passwörter stimmen nicht überein!', extra_tags='alert-danger')
-                return render(request, 'registration/register-company.html')
-
-            group = Group.objects.get(name='Betrieb')
-
-            user = User()
-            user.username = form.cleaned_data['username']
-            user.email    = form.cleaned_data['email']
-            user.password = form.cleaned_data['password']
-            user.phone = form.cleaned_data['phone']
-            user.save()
-
-            user.groups.add(group)
-
-            company = CompanyProfile()
-            company.owner = user
-            company.company_name = form.cleaned_data['company_name']
-            company.company_number = form.cleaned_data['company_number']
-            company.save()
-
-            login(request, user)
-
-            messages.success(request, 'Benutzerkonto wurde erfolgreich erstellt!', extra_tags='alert-success')
-            return redirect('/')
-        else:
-            messages.error(request, 'Ein Fehler ist aufgetreten. Bitte überprüfe deine Eingaben!', extra_tags='alert-danger')
-            return render(request, 'registration/register-company.html', {
-                'form': form
-            })
-
-class CompanyListView(View):
+# Displays all registered companies
+class CompanyListView(LoginRequiredMixin,View):
 
     def get(self, request):
         categories = Category.objects.all()
@@ -160,7 +89,6 @@ class CompanyListView(View):
             q = q.filter(id__in=filtered_companies)
 
 
-
         # Task paginator
         paginator = Paginator(q, 5)
         page_number = request.GET.get('page')
@@ -174,7 +102,8 @@ class CompanyListView(View):
             'page_obj': page_obj
         })
 
-class CompanyProfileView(View):
+# Displays the profile of a company
+class CompanyProfileView(LoginRequiredMixin,View):
 
     def get(self, request, id):
         company = CompanyProfile.objects.get(pk=id)
@@ -183,92 +112,69 @@ class CompanyProfileView(View):
             'company': company
         })
 
-class SettingsView(View):
+# Displays the company settings
+class SettingsView(LoginRequiredMixin,UpdateView):
+    model = CompanyProfile
+    form_class = SettingsCompanyForm
+    template_name = 'settings/company.html'
+
+    def get_success_url(self):
+        return '/settings'
+
+    def get_object(self):
+        return get_object_or_404(CompanyProfile, owner=self.request.user)
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+
+        # Koordinaten finden
+        if not self.object.find_coordinates():
+            messages.error(self.request, 'Ungültige Anschrift. Bitte überprüfe nochmal deine Angaben!', extra_tags='alert-danger')
+            return self.form_invalid(form)
+
+        messages.error(self.request, 'Die Einstellungen wurden erfolgreich gespeichert!', extra_tags='alert-success')
+        return super(SettingsView, self).form_valid(form)
+
+# Updates the user settings
+class SettingsUserView(LoginRequiredMixin,UpdateView):
+    model = User
+    form_class = SettingsUserForm
+    template_name = 'settings/user.html'
+
+    def get_success_url(self):
+        return '/settings/user'
+
+    def get_object(self):
+        return self.request.user
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Die Einstellungen wurden erfolgreich gespeichert!', extra_tags='alert-success')
+        return super().form_valid(form)
+
+# Deletes the user
+class DeleteUserView(LoginRequiredMixin,View):
 
     def get(self, request):
-        if request.user.groups.filter(name__in=['Helfer']).exists():
-            #citizen
-            citizen = CitizenProfile.objects.get(owner__id=request.user.id)
-            licenses = LicenseClass.objects.all()
-            return render(request, 'settings/citizen.html', {
-                'citizen': citizen,
-                'licenses': licenses
-            })
-        else:
-            #company
-            company = CompanyProfile.objects.get(owner__id=request.user.id)
-            return render(request, 'settings/company.html',{
-                'company': company
-            })
-
-    def post(self, request):
-        if request.user.groups.filter(name__in=['Helfer']).exists():
-            #citizen
-            form = SettingsCitizenForm(request.POST)
-
-            citizen = CitizenProfile.objects.get(owner__id=request.user.id)
-            licenses = LicenseClass.objects.all()
-
-            if form.is_valid():
-                citizen.description = form.cleaned_data['description']
-                citizen.drivers_licenses.set(form.cleaned_data['drivers_licenses'])
-                citizen.date_of_birth = form.cleaned_data['date_of_birth']
-                citizen.save()
-            return render(request, 'settings/citizen.html', {
-                'citizen': citizen,
-                'licenses': licenses
-            })
-        else:
-            #company
-            form = SettingsCompanyForm(request.POST)
-            company = CompanyProfile.objects.get(owner__id=request.user.id)
-
-            if form.is_valid():
-                company.description = form.cleaned_data['description']
-                company.street = form.cleaned_data['street']
-                company.zip_code = form.cleaned_data['zip_code']
-                company.city = form.cleaned_data['city']
-                company.country = form.cleaned_data['country']
-                company.owner.phone = form.cleaned_data['phone']
-                company.company_number = form.cleaned_data['company_number']
-                company.company_name = form.cleaned_data['company_name']
-
-                #calculate coordinates
-                company.find_coordinates()
-
-                company.save()
-
-            return render(request, 'settings/company.html',{
-                'company': company
-            })
-
-class SettingsUserView(View):
-
-    def get(self, request):
+        company = CompanyProfile.objects.get(owner__id=request.user.id)
         user = request.user
+        logout(request)
 
-        return render(request, 'settings/user.html',{
-            'user': user
-        })
+        send_mail('Ihr Account bei Abernten.de wurde gelöscht',
+                      'Hallo Nutzer. \n \n' +
+                      'Vielen Dank, dass du Abernten.de genutzt hast! \n \n' +
+                      #</br>
+                      'Wir haben wunschgemäß deinen Account und alle damit verbundenen Informationen gelöscht. \n \n'
+                      #</br>
+                      'Vielen Dank, \n \n'
+                      #</br>
+                      'Dein Abernten-Team \n',
+                      'info@abernten.de',
+                      [company.owner.email])
 
-    def post(self, request):
-        user = request.user
-        form = SettingsUserForm(request.POST)
+        company.delete()
+        user.delete()
 
-        if form.is_valid():
-            user.phone = form.cleaned_data['phone']
-            user.first_name = form.cleaned_data['first_name']
-            user.last_name = form.cleaned_data['last_name']
-            user.email = form.cleaned_data['email']
-            user.save()
 
-        return render(request, 'settings/user.html',{
-            'user': user
-        })
 
-class ResetPasswordView(View):
-    def get(self,request):
-        return render(request, 'registration/reset-password.html',{
-
-        })
+        return redirect('/')
 

@@ -1,7 +1,7 @@
 {% load static %}
 
 <!-- Navigation -->
-<nav class="navbar navbar-light bg-light navbar-expand-lg">
+<nav class="navbar navbar-light bg-light navbar-expand-lg main-navbar">
     <div class="container">
         <!-- Logo -->
         <a class="navbar-brand" href="/">
@@ -20,7 +20,7 @@
                     <a class="nav-link" href="/">Startseite</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/tasks">Angebote</a>
+                    <a class="nav-link" href="/tasks">Inserate</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/companies">Betriebe</a>
@@ -33,20 +33,37 @@
                     {% if request.user.is_authenticated %}
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Eingeloggt als <strong>{{ request.user.username }}</strong>
-                        <span class="badge badge-danger">4</span>
+
+                        {% if task_offer_count > 0 %}
+                            <span class="badge badge-danger">{{ task_offer_count }}</span>
+                        {% endif %}
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="/interests">
+                        <a class="dropdown-item" href="/tasks/create">
+                            <i class="fas fa-fw fa-plus mr-2"></i>
+                            Inserat erstellen
+                        </a>
+
+                        <div class="dropdown-divider"></div>
+
+                        <a class="dropdown-item" href="/tasks/my-task-list">
                             <i class="fas fa-fw fa-bullhorn mr-2"></i>
-                            Meine Angebote
-                            <span class="badge badge-danger ml-2">4</span>
+                            Meine Inserate
+                        </a>
+
+                        <a class="dropdown-item" href="/tasks/offers">
+                            <i class="fas fa-fw fa-users mr-2"></i>
+                            Bewerber
+                            {% if task_offer_count > 0 %}
+                                <span class="badge badge-danger">{{ task_offer_count }}</span>
+                            {% endif %}
                         </a>
 
                         <div class="dropdown-divider"></div>
 
                         <a class="dropdown-item" href="/settings">
-                            <i class="fas fa-fw fa-users mr-2"></i>
-                            Profileinstellungen
+                            <i class="fas fa-fw fa-building mr-2"></i>
+                            Firmenprofil
                         </a>
 
                         <a class="dropdown-item" href="/settings/user">

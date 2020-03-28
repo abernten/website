@@ -8,64 +8,16 @@
 
 <div class="header text-center" style="background-image: url('{% static 'img/dan-meyers-IQVFVH0ajag-unsplash.jpg' %}'); padding: 5rem 0;">
   <div class="container">
-    <!-- Filteroptionen -->
-    <div class="card my-4 shadow bg-light">
-      <div class="card-body">
-        <form method="GET" action="">
-          <div class="row">
-            <div class="col-12 col-sm-6 col-lg mb-3 mb-lg-0">
-              <!-- Filter: Ort -->
-              <div class="input-group">
-                <div class="input-group-prepend">
-                  <label class="input-group-text" for="location">Ort</label>
-                </div>
-                <input type="text" name="loc" id="location" class="form-control" placeholder="Bsp.: Berlin, Nürnberg, ..." {% if request.GET.loc %}value="{{ request.GET.loc }}"{% endif %}>
-              </div>
-            </div>
-            <div class="col-12 col-sm-6 col-lg mb-3 mb-lg-0">
-              <!-- Filter: Radius -->
-              <div class="input-group">
-                <div class="input-group-prepend">
-                  <label class="input-group-text" for="location_radius">Umkreis (km)</label>
-                </div>
-                <input type="text" name="r" id="location_radius" class="form-control" placeholder="50" {% if radius %}value="{{ radius }}"{% endif %}>
-              </div>
-            </div>
-            <div class="col-12 col-sm-8 col-lg mb-3 mb-sm-0">
-              <!-- Filter: Kategorien -->
-              <div class="input-group">
-                <div class="input-group-prepend">
-                  <label class="input-group-text" for="category">Kategorie</label>
-                </div>
-                <select class="custom-select" name="cat" id="category" length="400px">
-                  <!-- Liste der verfügbaren Kategorien -->
-                  <option value="0">Alles</option>
-                  {% for c in categories %}
-                    <option value="{{ c.id }}" {% ifequal c.id|stringformat:'s' request.GET.cat %}selected{% endifequal %}>{{ c.name }}</option>
-                  {% endfor %}
-                </select>
-              </div>
-            </div>
-            <div class="col-12 col-sm col-lg-1">
-              <button type="submit" class="btn btn-block btn-secondary">
-                <i class="fas fa-search fa-fw"></i>
-              </button>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
+    <h2 style="font-weight: 300 !important;" class="d-block">Meine Inserate</h2>
   </div>
 </div>
 
 <div class="container py-4">
   <div class="task-list">
-    <h4 class="mb-5"><strong>{{ task_count }}</strong> Ergebnisse gefunden</h4>
-
     {% for task in page_obj %}
 
     <a href="/tasks/{{ task.id }}" class="task">
-    <div class="card my-3 d-block overflow-hidden">
+    <div class="card my-4 d-block overflow-hidden">
 
       <div class="row">
         <div class="col-12 col-md mx-3 p-4">

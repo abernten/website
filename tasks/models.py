@@ -25,10 +25,10 @@ class Task(models.Model):
     company = models.ForeignKey('erntehelfer.CompanyProfile', on_delete=models.CASCADE)
 
     # Grunddaten
-    title         = models.CharField(verbose_name='Kurzbeschreibung', max_length=250)
-    description   = models.TextField(verbose_name='Beschreibung des Angebots')
+    title         = models.CharField(verbose_name='Stellenbeschreibung', help_text='Kurz zusammengefasst um was es geht', max_length=250)
+    description   = models.TextField(verbose_name='Beschreibung des Angebots', help_text='Ausführliche Beschreibung der Tätigkeiten oder weitere Details')
     category      = models.ForeignKey('Category', verbose_name='Kategorie', on_delete=models.PROTECT)
-    helpers_count = models.IntegerField(verbose_name='Benötigte Helfer', default=1, validators=[MinValueValidator(1), MaxValueValidator(2000)])
+    helpers_count = models.IntegerField(verbose_name='Anzahl der benötigten Helfer', default=1, validators=[MinValueValidator(1), MaxValueValidator(2000)])
 
     # Ort
     zip_code  = models.CharField(verbose_name='Postleitzahl', max_length=16)
@@ -36,11 +36,11 @@ class Task(models.Model):
     latitude  = models.DecimalField(max_digits=12, decimal_places=8)
 
     # Beginn und Ende
-    start_date = models.DateField(verbose_name='Beginn')
+    start_date = models.DateField(verbose_name='Arbeitsbeginn')
     end_date   = models.DateField(verbose_name='Ende')
 
     # Erforderliche Führerscheinklassen
-    drivers_licenses = models.ManyToManyField('erntehelfer.LicenseClass', verbose_name='Führerscheinklassen', blank=True) # Liste an Fueherscheinen
+    drivers_licenses = models.ManyToManyField('erntehelfer.LicenseClass', verbose_name='Führerscheinklassen', help_text='Führerscheinklassen, die zur Ausführung der Arbeit erforderlich sind', blank=True) # Liste an Fueherscheinen
 
     # Kennzeichen, wenn die Aufgabe eingestellt wurde
     done = models.BooleanField(default=False)
@@ -92,7 +92,7 @@ class TaskOffer(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     # Verknüpftes Inserat
-    task = models.ForeignKey('Task', on_delete=models.PROTECT)
+    task = models.ForeignKey('Task', on_delete=models.CASCADE)
 
     # Bewerbungsdaten
     full_name        = models.CharField(max_length=250, verbose_name='Vollständiger Name')
@@ -100,10 +100,14 @@ class TaskOffer(models.Model):
     email            = models.EmailField(verbose_name='E-Mail Adresse')
     phone            = models.CharField(max_length=150, verbose_name='Telefonnummer')
     drivers_licenses = models.ManyToManyField('erntehelfer.LicenseClass', verbose_name='Führerscheinklassen', blank=True)
-    message          = models.TextField(verbose_name='Nachricht an den Betrieb')
+    message          = models.TextField(verbose_name='Nachricht an den Betrieb', max_length=500)
 
     # State
     state = models.IntegerField(default=OPEN, choices=STATE_CHOICES)
 
     def get_absolute_url(self):
         return self.task.get_absolute_url()
+
+    def age(self):
+        import datetime
+        return int((datetime.date.today() - self.date_of_birth).days / 365.25)
