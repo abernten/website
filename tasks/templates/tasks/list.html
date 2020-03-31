@@ -6,10 +6,10 @@
 {% block content %}
 {% include 'components/navbar.html' %}
 
-<div class="header text-center" style="background-image: url('{% static 'img/dan-meyers-IQVFVH0ajag-unsplash.jpg' %}'); padding: 5rem 0;">
+<div class="header text-center" style="background-image: url('{% static 'img/dan-meyers-IQVFVH0ajag-unsplash.jpg' %}');">
   <div class="container">
     <!-- Filteroptionen -->
-    <div class="card my-4 shadow bg-light">
+    <div class="card my-5 shadow bg-light">
       <div class="card-body">
         <form method="GET" action="">
           <div class="row">
@@ -60,7 +60,7 @@
 
 <div class="container py-4">
   <div class="task-list">
-    <h4 class="mb-5"><strong>{{ task_count }}</strong> Ergebnisse gefunden</h4>
+    <h4 class="mb-5 text-center"><strong>{{ task_count }}</strong> Ergebnisse gefunden</h4>
 
     {% for task in page_obj %}
 
@@ -73,7 +73,9 @@
           <h6>{{ task.company.company_name }}</h6>
 
           <p class="text-secondary my-3">
+            {% if task.description %}
             {{ task.description | truncatechars:250 }}
+            {% endif %}
           </p>
 
           <small class="text-muted">

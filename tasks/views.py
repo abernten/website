@@ -167,6 +167,14 @@ class ApplyTaskView(CreateView):
         task = get_object_or_404(Task, pk=self.kwargs['id'])
         self.object.task = task
 
+        # E-Mail an Betrieb senden
+        tmpl = render_to_string('emails/new-offer.txt', {
+            'username': task.company.owner.username,
+            'full_name': self.object.full_name,
+            'title': task.title
+        })
+        send_mail('[Abernten.de] Du hast eine neue Bewerbung!', tmpl, 'info@abernten.de', [task.company.owner.email])
+
         messages.success(self.request, 'Vielen Dank, dass du deine Hilfe anbietest! Du erhälst demnächst eine Antwort vom Betrieb.', extra_tags='alert-success')
 
         return super(ApplyTaskView, self).form_valid(form)

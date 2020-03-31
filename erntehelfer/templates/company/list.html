@@ -7,12 +7,10 @@
 
 {% include 'components/navbar.html' %}
 
-<div class="header text-center" style="background-image: url('{% static 'img/richard-bell-vpfEhvI5UE4-unsplash.jpg' %}')">
+<div class="header text-center" style="background-image: url('{% static 'img/header-bg.jpg' %}')">
   <div class="container">
-    <h2 style="font-weight: 300 !important;" class="mb-5 d-block">Alle Betriebe</h2>
-
     <!-- Filteroptionen -->
-    <div class="card my-4 shadow bg-light">
+    <div class="card my-5 shadow bg-light">
       <div class="card-body">
         <form method="GET" action="">
           <div class="row">
@@ -50,7 +48,7 @@
   <div class="container py-4">
 
     <div>
-      <h4><strong>{{ company_count }}</strong> Betriebe gefunden</h4>
+      <h4 class="mb-5 text-center"><strong>{{ company_count }}</strong> Betriebe angemeldet</h4>
 
       {% for q in page_obj %}
 
@@ -62,7 +60,9 @@
             <h6>{{ q.company_number }}</h6>
 
             <p class="text-muted mt-3">
+              {% if q.description %}
               {{ q.description | truncatechars:250 }}
+              {% endif %}
             </p>
           </div>
 
@@ -70,7 +70,7 @@
             <div class="row">
               <div class="col-12 ">
                 <p>
-                  <small class="text-muted">Offene Aufgaben:</small><br>
+                  <small class="text-muted">Inserate:</small><br>
                   {{ q.get_open_tasks.count }}<br><br>
                   <small class="text-muted">Postleitzahl:</small><br>
                   {{ q.zip_code }}

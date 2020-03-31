@@ -1,0 +1,7 @@
+Hallo {{ username }}!
+
+Du hast eine neue Bewerbung von {{ full_name }} auf {{ title }}!
+
+Viele Grüße,
+
+Dein Abernten.de-Team

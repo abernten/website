@@ -29,15 +29,39 @@
 }
 
 .main-footer {
-  height: 10vh;
+  height: 15vh;
   right: 0;
   bottom: 0;
   left: 0;
   padding: 1rem;
-  background-color: rgb(32, 46, 46);
   text-align: center;
+  background-color: #0e0e19;
+  color: #efefef;
+}
+
+.main-footer a {
+  color: #efefef;
 }
 
 .asteriskField {
   color: red;
 }
+
+.navbar-nav .nav-item {
+  letter-spacing: 0.04em;
+  margin-left: .5rem;
+  margin-right: .5rem;
+}
+
+.hr-replacement {
+  margin: 0 auto;
+  height: 2px;
+  background: #a88b48;
+  max-width: 8rem;
+  border: none;
+}
+
+.btn-outline-shadow {
+  background-color: rgba(0,0,0,0.6);
+}
+

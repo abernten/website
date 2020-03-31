@@ -1,4 +1,8 @@
-#!/bin/sh
+#!/bin/bash
+
+while ! mysqladmin ping -h"$DB_HOST" --silent; do
+    sleep 1
+done
 
 if [ ! -f /usr/src/app/installed ]; then
     python ./manage.py migrate

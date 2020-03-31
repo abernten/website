@@ -6,7 +6,7 @@ WORKDIR /usr/src/app
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-RUN apk add alpine-sdk mariadb-dev
+RUN apk add --no-cache alpine-sdk mariadb-dev mariadb-client bash
 
 RUN pip install --upgrade pip
 

@@ -1,16 +1,14 @@
 {% extends 'layout.html' %}
 {% load static %}
 
-{% block title %}Startseite{% endblock %}
+{% block title %}Vermittlungsplatform für Erntehelfer und Landwirte{% endblock %}
 
 {% block styles %}
 {{ block.super }}
 <style>
 .team-container {
   display: block;
-  background: #FAFAFA;
-  border-top: 1px solid #CCC;
-  border-bottom: 1px solid #CCC;
+  background: #F5F5F5;
 }
 
 .team-container img {
@@ -25,33 +23,43 @@
 .homepage-button:hover {
     text-decoration: none;
 }
+
+.header {
+  padding: 12rem 0;
+}
+
+@media screen and (max-width: 992px) {
+  .header {
+    padding: 4rem 0;
+  }
+}
 </style>
 {% endblock %}
 
 {% block content %}
 {% include 'components/navbar.html' %}
 
-<div class="header text-center" style="background-image: url('{% static 'img/header-bg.jpg' %}'); padding: 7rem 0;">
+<div class="header text-center" style="background-image: url('{% static 'img/dan-meyers-IQVFVH0ajag-unsplash.jpg' %}');">
   <div class="container">
 
     <div class="row align-items-center">
-      <div class="col">
+      <div class="col-12 my-4 my-lg-0 col-lg">
         <a href="/tasks" class="homepage-button">
-          <Button class="btn btn-lg btn-block btn-light" style="height: 5rem;">
+          <button class="btn btn-lg btn-block btn-outline-light btn-outline-shadow shadow" style="height: 5rem;">
             <i class="fas fa-fw fa-hands-helping mr-2"></i>
             Mithelfen
-          </Button>
+          </button>
         </a>
       </div>
-      <div class="col text-center text-light">
-        <p>oder</p>
+      <div class="col d-none d-lg-block text-center text-light">
+        <p class="m-0 text-uppercase">oder</p>
       </div>
-      <div class="col">
+      <div class="col-12 col-lg">
         <a {% if request.user.is_authenticated %}href="/tasks/create"{% else %}href="/accounts/register"{% endif %} class="homepage-button">
-          <Button class="btn btn-lg btn-block btn-light" style="height: 5rem;">
+          <button class="btn btn-lg btn-block btn-outline-light btn-outline-shadow shadow" style="height: 5rem;">
             <i class="fas fa-fw fa-search mr-2"></i>
             Nach Helfern suchen
-          </Button>
+          </button>
         </a>
       </div>
     </div>
@@ -59,8 +67,10 @@
   </div>
 </div>
 
-<div class="container my-4">
-  <h4 class="my-5 text-center"><strong>Was wir bewegen wollen</strong></h4>
+<div class="container my-5">
+  <h3 class="mt-5 text-center font-weight-bold text-dark">Was wir bewegen wollen</h3>
+
+  <hr class="hr-replacement mt-3 mb-5" />
 
   <div class="mx-auto my-4 text-center embed-responsive embed-responsive-16by9" style="display: block; max-width: 750px;">
     <iframe src="https://www.youtube.com/embed/PqQPJUPv3DM" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
@@ -88,24 +98,38 @@
 <div class="team-container text-center py-5">
   <div class="container">
 
-    <h4 class="mb-5"><strong>Das Team hinter Abernten</strong></h4>
+    <h3 class="mt-5 font-weight-bold text-dark">Das Team hinter Abernten</h3>
 
-    <div class="row">
+    <hr class="hr-replacement mt-3 mb-5" />
+
+    <div class="row my-5 pt-5">
       <div class="col-12 col-sm-6 col-lg mb-4 mb-lg-0">
-        <img src="{% static '/img/team/andre-kienzle.jpg' %}" style="max-height: 130px" class="rounded-circle mb-4">
-        <h5>André Kienzle</h5>
+        <img src="{% static '/img/team/andre-kienzle.jpg' %}" style="max-height: 120px" class="rounded-circle mb-4">
+        <h6 class="text-dark">André Kienzle</h6>
+        <p class="text-muted">
+          IT-Auszubildender
+        </p>
       </div>
       <div class="col-12 col-sm-6 col-lg mb-4 mb-lg-0">
-        <img src="{% static '/img/team/dennis-bruner.jpg' %}" style="max-height: 130px" class="rounded-circle mb-4">
-        <h5>Dennis Bruner</h5>
+        <img src="{% static '/img/team/dennis-bruner.jpg' %}" style="max-height: 120px" class="rounded-circle mb-4">
+        <h6 class="text-dark">Dennis Bruner</h6>
+        <p class="text-muted">
+          IT-Auszubildender
+        </p>
       </div>
       <div class="col-12 col-sm-6 col-lg mb-4 mb-lg-0">
-        <img src="{% static '/img/team/jacqueline-baumueller.jpg' %}" style="max-height: 130px" class="rounded-circle mb-4">
-        <h5>Jacqueline Baumüller</h5>
+        <img src="{% static '/img/team/jacqueline-baumueller.jpg' %}" style="max-height: 120px" class="rounded-circle mb-4">
+        <h6 class="text-dark">Jacqueline Baumüller</h6>
+        <p class="text-muted">
+          IT-Auszubildende
+        </p>
       </div>
       <div class="col-12 col-sm-6 col-lg mb-4 mb-lg-0">
-        <img src="{% static '/img/team/lukas-kielmann.jpg' %}" style="max-height: 130px" class="rounded-circle mb-4">
-        <h5>Lukas Kielmann</h5>
+        <img src="{% static '/img/team/lukas-kielmann.jpg' %}" style="max-height: 120px" class="rounded-circle mb-4">
+        <h6 class="text-dark">Lukas Kielmann</h6>
+        <p class="text-muted">
+          IT-Auszubildender
+        </p>
       </div>
     </div>
 
@@ -115,6 +139,9 @@
 <div class="container-fluid text-center py-5">
   <a href="https://wirvsvirushackathon.org">
     <img src="{% static 'img/Logo_Projekt_02.svg' %}" style="max-height: 100px;">
+  </a>
+  <a href="https://github.com/abernten/website">
+    <img src="{% static 'img/GitHub-Mark-120px-plus.png' %}" style="max-height: 100px;">
   </a>
 </div>
 
