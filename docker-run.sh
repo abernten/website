@@ -6,7 +6,7 @@ done
 
 if [ ! -f /usr/src/app/installed ]; then
     python ./manage.py migrate
-    python ./manage.py loaddata LicenceClasses
+    python ./manage.py loaddata LicenseClasses
     python ./manage.py loaddata Categories
 
     touch /usr/src/app/installed
