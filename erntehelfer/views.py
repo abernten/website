@@ -35,7 +35,7 @@ class RegisterCompanyView(FormView):
         # Benutzer anlegen
         user = User()
         user.username = form.cleaned_data['username']
-        user.password = form.cleaned_data['password']
+        user.set_password(form.cleaned_data['password'])
         user.email = form.cleaned_data['email']
         user.phone = form.cleaned_data['phone']
         user.save()
