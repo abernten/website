@@ -28,7 +28,8 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
-    'abernten.de'
+    'abernten.de',
+    '192.168.178.2'
 ]
 
 
